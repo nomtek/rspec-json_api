@@ -7,5 +7,5 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 gemspec
 
 gem "rake", "~> 13.0"
-gem "rspec", "~> 3.10"
+gem "rspec-rails", "~> 3.4"
 gem "rubocop", "~> 1.19"

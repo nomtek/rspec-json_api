@@ -1,0 +1,30 @@
+# frozen_string_literal: true
+
+class Hash
+  def deep_keys
+    each_with_object([]) do |(k, v), keys|
+      keys << k
+      keys << v.deep_keys if v.respond_to?(:keys)
+    end
+  end
+
+  def get_deep_key_paths
+    stack = map { |k, v| [[k], v] }
+
+    key_map = []
+
+    until stack.empty?
+      key, value = stack.pop
+
+      key_map << key unless value.is_a? Hash
+
+      next unless value.is_a? Hash
+
+      value.map do |k, v|
+        stack.push [key.dup << k, v]
+      end
+    end
+
+    key_map.reverse
+  end
+end
