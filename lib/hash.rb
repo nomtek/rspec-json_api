@@ -27,4 +27,10 @@ class Hash
 
     key_map.reverse
   end
+
+  def sanitize!(keys)
+    keep_if do |k, _v|
+      keys.include?(k)
+    end
+  end
 end
