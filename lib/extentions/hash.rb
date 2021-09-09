@@ -1,16 +1,17 @@
 # frozen_string_literal: true
 
+# Extention methods for hash class
 class Hash
   def deep_keys
     each_with_object([]) do |(k, v), keys|
       keys << k
+      v = v.schema if v.respond_to?(:schema)
       keys << v.deep_keys if v.respond_to?(:keys)
     end
   end
 
-  def get_deep_key_paths
+  def deep_key_paths
     stack = map { |k, v| [[k], v] }
-
     key_map = []
 
     until stack.empty?
