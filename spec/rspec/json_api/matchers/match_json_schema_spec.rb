@@ -23,7 +23,7 @@ RSpec.describe "match_json_schema matcher" do
             id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
             name: "TestName2",
             number: 2,
-            color: "red"
+            color: nil
           }
         ],
         not_interfaces_array: [
@@ -40,7 +40,7 @@ RSpec.describe "match_json_schema matcher" do
         email: "test@test.com",
         sex: "Male",
         height: 170,
-        age: 21,
+        age: 50,
         preferences: {
           id: "6",
           color: "blue",
@@ -75,7 +75,7 @@ RSpec.describe "match_json_schema matcher" do
         email: Rspec::JsonApi::Types::EMAIL,
         sex: -> { { inclusion: %w[Male Female] } },
         height: -> { { type: Integer, lambda: ->(actual) { actual.even? } } },
-        age: -> { { type: Integer, min: 1, max: 100 } },
+        age: -> { { type: Integer, min: 1, max: 100, allow_blank: false } },
         preferences: {
           id: "6",
           color: /^bl.*$/,

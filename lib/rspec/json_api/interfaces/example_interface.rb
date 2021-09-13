@@ -7,7 +7,7 @@ module Rspec
         id: Types::UUID,
         name: String,
         number: Integer,
-        color: -> { { inclusion: %w[black red white] } }
+        color: -> { { inclusion: %w[black red white], allow_blank: true } }
       }.freeze
     end
   end

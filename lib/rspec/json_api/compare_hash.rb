@@ -5,7 +5,7 @@ module Rspec
     module CompareHash
       extend self
 
-      SUPPORTED_OPTIONS = %i[optional type value min max inclusion regex lambda].freeze
+      SUPPORTED_OPTIONS = %i[allow_blank type value min max inclusion regex lambda].freeze
 
       def compare(actual, expected)
         return false if actual.blank? && expected.present?
@@ -48,9 +48,13 @@ module Rspec
       def compare_proc(actual_value, expected_value)
         payload = expected_value.call
         payload.sanitize!(SUPPORTED_OPTIONS)
+        payload = payload.sort_by { |k, _v| k == :allow_blank ? 0 : 1 }.to_h
 
         payload.all? do |condition_key, condition_value|
           case condition_key
+          when :allow_blank
+            return true if actual_value.blank? && condition_value
+            true
           when :type
             compare_class(actual_value, condition_value)
           when :value
