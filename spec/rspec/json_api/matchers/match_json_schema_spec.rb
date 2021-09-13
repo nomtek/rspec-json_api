@@ -12,6 +12,29 @@ RSpec.describe "match_json_schema matcher" do
           number: 1,
           color: "red"
         },
+        examples: [
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "TestName",
+            number: 1,
+            color: "red"
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "TestName2",
+            number: 2,
+            color: "red"
+          }
+        ],
+        not_interfaces_array: [
+          {
+            name: "Bon"
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a"
+          },
+          {}
+        ],
         email: "test@test.com",
         sex: "Male",
         height: 170,
@@ -35,6 +58,15 @@ RSpec.describe "match_json_schema matcher" do
         id: Rspec::JsonApi::Types::UUID,
         name: "Michal",
         example: Rspec::JsonApi::Interfaces::EXAMPLE_INTERFACE,
+        examples: Array[Rspec::JsonApi::Interfaces::EXAMPLE_INTERFACE],
+        not_interfaces_array: [
+          {
+            name: "Bon"
+          },
+          {
+            id: Rspec::JsonApi::Types::UUID
+          }
+        ],
         email: Rspec::JsonApi::Types::EMAIL,
         sex: -> { { inclusion: %w[Male Female] } },
         height: -> { { type: Integer, lambda: ->(actual) { actual.even? } } },

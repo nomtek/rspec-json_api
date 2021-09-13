@@ -2,6 +2,7 @@
 
 # Load 3th party libraries
 require "json"
+require "active_support/core_ext/object"
 
 # Load the json_api parts
 require "extentions/hash"

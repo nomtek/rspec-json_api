@@ -8,10 +8,11 @@ module Rspec
       SUPPORTED_OPTIONS = %i[optional type value min max inclusion regex lambda].freeze
 
       def compare(actual, expected)
+        return false if actual.blank? && expected.present?
+
         key_paths = actual.deep_key_paths
 
         key_paths.all? do |key_path|
-
           actual_value = actual.dig(*key_path)
           expected_value = expected.dig(*key_path)
 
@@ -77,8 +78,16 @@ module Rspec
           type = expected_value[0]
 
           actual_value.all? { |elem| compare_class(elem, type) }
+        elsif expected_value.size == 1 && expected_value[0].is_a?(Hash)
+          interface = expected_value[0]
+
+          actual_value.all? do |elem|
+            compare(elem, interface)
+          end
         else
-          compare_value(actual_value, expected_value)
+          actual_value.each_with_index.all? do |elem, index|
+            elem.is_a?(Hash) ? compare(elem, expected_value[index]) : compare_value(elem, expected_value[index])
+          end
         end
       end
 
