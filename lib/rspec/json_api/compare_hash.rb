@@ -74,17 +74,17 @@ module Rspec
       end
 
       def compare_array(actual_value, expected_value)
-        if expected_value.size == 1 && expected_value[0].instance_of?(Class)
+        if simple_type?(expected_value)
           type = expected_value[0]
 
           actual_value.all? { |elem| compare_class(elem, type) }
-        elsif expected_value.size == 1 && expected_value[0].is_a?(Hash)
+        elsif interface?(expected_value)
           interface = expected_value[0]
 
-          actual_value.all? do |elem|
-            compare(elem, interface)
-          end
+          actual_value.all? { |elem| compare(elem, interface) }
         else
+          return false if actual_value.size != expected_value.size
+
           actual_value.each_with_index.all? do |elem, index|
             elem.is_a?(Hash) ? compare(elem, expected_value[index]) : compare_value(elem, expected_value[index])
           end
@@ -93,6 +93,14 @@ module Rspec
 
       def compare_value(actual_value, expected_value)
         actual_value == expected_value
+      end
+
+      def simple_type?(expected_value)
+        expected_value.size == 1 && expected_value[0].instance_of?(Class)
+      end
+
+      def interface?(expected_value)
+        expected_value.size == 1 && expected_value[0].is_a?(Hash)
       end
     end
   end

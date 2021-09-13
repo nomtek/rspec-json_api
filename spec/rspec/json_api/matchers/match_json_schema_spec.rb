@@ -28,12 +28,14 @@ RSpec.describe "match_json_schema matcher" do
         ],
         not_interfaces_array: [
           {
-            name: "Bon"
+            hash_array: [
+              { id: "123123123" },
+              { uuid: "8eccff73-f134-42f2-aed4-751d1f4ebd4a" }
+            ]
           },
-          {
-            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a"
-          },
-          {}
+          { id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a" },
+          {},
+          []
         ],
         email: "test@test.com",
         sex: "Male",
@@ -61,11 +63,14 @@ RSpec.describe "match_json_schema matcher" do
         examples: Array[Rspec::JsonApi::Interfaces::EXAMPLE_INTERFACE],
         not_interfaces_array: [
           {
-            name: "Bon"
+            hash_array: [
+              { id: "123123123" },
+              { uuid: Rspec::JsonApi::Types::UUID }
+            ]
           },
-          {
-            id: Rspec::JsonApi::Types::UUID
-          }
+          { id: Rspec::JsonApi::Types::UUID },
+          {},
+          Array[]
         ],
         email: Rspec::JsonApi::Types::EMAIL,
         sex: -> { { inclusion: %w[Male Female] } },
