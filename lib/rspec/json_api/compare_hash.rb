@@ -5,21 +5,15 @@ module Rspec
     module CompareHash
       extend self
 
-      SUPPORTED_OPTIONS = %i[type value min max inclusion regex lambda].freeze
+      SUPPORTED_OPTIONS = %i[optional type value min max inclusion regex lambda].freeze
 
       def compare(actual, expected)
         key_paths = actual.deep_key_paths
 
         key_paths.all? do |key_path|
-          actual_value = nil
-          expected_value = nil
 
-          key_path.each_with_object([]) do |elem, memo|
-            memo << [memo, elem].flatten
-            expected_value = expected[*memo[0]]
-            actual_value = actual[*memo[0]]
-            break unless expected_value.is_a?(Hash)
-          end
+          actual_value = actual.dig(*key_path)
+          expected_value = expected.dig(*key_path)
 
           compare_hash_values(actual_value, expected_value)
         end
@@ -37,22 +31,13 @@ module Rspec
           compare_proc(actual_value, expected_value)
         when Array
           compare_array(actual_value, expected_value)
-        when Hash
-          # It occours only for interfaces
-          compare(actual_value, expected_value)
         else
           compare_value(actual_value, expected_value)
         end
       end
 
       def compare_class(actual_value, expected_value)
-        if expected_value.respond_to?(:schema)
-          schema = expected_value.schema
-
-          compare(actual_value, schema)
-        else
-          actual_value.instance_of?(expected_value)
-        end
+        actual_value.instance_of?(expected_value)
       end
 
       def compare_regexp(actual_value, expected_value)

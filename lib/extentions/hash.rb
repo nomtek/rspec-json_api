@@ -5,7 +5,6 @@ class Hash
   def deep_keys
     each_with_object([]) do |(k, v), keys|
       keys << k
-      v = v.schema if v.respond_to?(:schema)
       keys << v.deep_keys if v.respond_to?(:keys)
     end
   end
