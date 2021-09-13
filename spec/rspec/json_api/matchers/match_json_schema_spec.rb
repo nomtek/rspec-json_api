@@ -13,41 +13,41 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
-  context 'when exact match' do
+  context "when exact match" do
     let(:expected) do
       {
-        id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
-        name: 'Caroline Mayer',
+        id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+        name: "Caroline Mayer",
         age: 15
       }
     end
 
-    context 'when correct match' do
+    context "when correct match" do
       let(:actual) do
         {
-          id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
-          name: 'Caroline Mayer',
+          id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+          name: "Caroline Mayer",
           age: 15
         }.to_json
       end
 
-      include_examples 'correct-match'
+      include_examples "correct-match"
     end
 
-    context 'when incorrect match' do
+    context "when incorrect match" do
       let(:actual) do
         {
-          id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
-          name: 'Caroline Mayer',
+          id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+          name: "Caroline Mayer",
           age: 16
         }.to_json
       end
 
-      include_examples 'incorrect-match'
+      include_examples "incorrect-match"
     end
   end
 
-  context 'when typed schema' do
+  context "when data typed schema" do
     let(:expected) do
       {
         id: String,
@@ -56,28 +56,96 @@ RSpec.describe "match_json_schema matcher" do
       }
     end
 
-    context 'when correct match' do
+    context "when correct match" do
       let(:actual) do
         {
-          id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
-          name: 'Caroline Mayer',
+          id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+          name: "Caroline Mayer",
           age: 15
         }.to_json
       end
 
-      include_examples 'correct-match'
+      include_examples "correct-match"
     end
 
-    context 'when incorrect match' do
+    context "when incorrect match" do
       let(:actual) do
         {
-          id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
+          id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
           name: 13,
-          age: '15'
+          age: "15"
         }.to_json
       end
 
-      include_examples 'incorrect-match'
+      include_examples "incorrect-match"
+    end
+  end
+
+  context "when custom types" do
+    describe "email" do
+      let(:expected) do
+        { email: Rspec::JsonApi::Types::EMAIL }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          { email: "test_test.test+test@test.com" }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          { email: "+test_test.test+test.com" }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    describe "uri" do
+      let(:expected) do
+        { uri: Rspec::JsonApi::Types::URI }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          { uri: "https://example.com/sample?page=10&id=5#section" }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          { uri: "hxxpsexample.com/sample?page=10&id=5#section" }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    describe "uuid" do
+      let(:expected) do
+        { uuid: Rspec::JsonApi::Types::UUID }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          { uuid: "07bbf12b-df44-4c8d-9415-aa33f51c5fc2" }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          { uuid: "07bbf12b-df44-4c8d-9415-aa33f51c5f" }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
     end
   end
 
@@ -170,6 +238,6 @@ RSpec.describe "match_json_schema matcher" do
       }
     end
 
-    include_examples 'correct-match'
+    include_examples "correct-match"
   end
 end

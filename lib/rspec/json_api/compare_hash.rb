@@ -54,6 +54,7 @@ module Rspec
           case condition_key
           when :allow_blank
             return true if actual_value.blank? && condition_value
+
             true
           when :type
             compare_class(actual_value, condition_value)
