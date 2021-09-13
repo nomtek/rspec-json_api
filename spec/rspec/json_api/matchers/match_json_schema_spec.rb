@@ -1,7 +1,87 @@
 # frozen_string_literal: true
 
 RSpec.describe "match_json_schema matcher" do
-  context "when mixed expected schema" do
+  shared_examples "correct-match" do
+    it "matches expected schema" do
+      expect(actual).to match_json_schema(expected)
+    end
+  end
+
+  shared_examples "incorrect-match" do
+    it "does not matche expected schema" do
+      expect(actual).not_to match_json_schema(expected)
+    end
+  end
+
+  context 'when exact match' do
+    let(:expected) do
+      {
+        id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
+        name: 'Caroline Mayer',
+        age: 15
+      }
+    end
+
+    context 'when correct match' do
+      let(:actual) do
+        {
+          id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
+          name: 'Caroline Mayer',
+          age: 15
+        }.to_json
+      end
+
+      include_examples 'correct-match'
+    end
+
+    context 'when incorrect match' do
+      let(:actual) do
+        {
+          id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
+          name: 'Caroline Mayer',
+          age: 16
+        }.to_json
+      end
+
+      include_examples 'incorrect-match'
+    end
+  end
+
+  context 'when typed schema' do
+    let(:expected) do
+      {
+        id: String,
+        name: String,
+        age: Integer
+      }
+    end
+
+    context 'when correct match' do
+      let(:actual) do
+        {
+          id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
+          name: 'Caroline Mayer',
+          age: 15
+        }.to_json
+      end
+
+      include_examples 'correct-match'
+    end
+
+    context 'when incorrect match' do
+      let(:actual) do
+        {
+          id: '8eccff73-f134-42f2-aed4-751d1f4ebd4f',
+          name: 13,
+          age: '15'
+        }.to_json
+      end
+
+      include_examples 'incorrect-match'
+    end
+  end
+
+  context "when complex mixed schema" do
     let(:actual) do
       {
         id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
@@ -90,8 +170,6 @@ RSpec.describe "match_json_schema matcher" do
       }
     end
 
-    it "matches expected schema" do
-      expect(actual).to match_json_schema(expected)
-    end
+    include_examples 'correct-match'
   end
 end
