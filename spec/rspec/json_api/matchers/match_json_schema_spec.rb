@@ -13,12 +13,24 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
-  context "when exact match" do
+  context "when exact match given" do
     let(:expected) do
       {
         id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
         name: "Caroline Mayer",
-        age: 15
+        age: 25,
+        children: [
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "Webster Medina",
+            age: 2
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+            name: "Roy Mcdaniel",
+            age: 3
+          }
+        ]
       }
     end
 
@@ -27,7 +39,19 @@ RSpec.describe "match_json_schema matcher" do
         {
           id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
           name: "Caroline Mayer",
-          age: 15
+          age: 25,
+          children: [
+            {
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+              name: "Webster Medina",
+              age: 2
+            },
+            {
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+              name: "Roy Mcdaniel",
+              age: 3
+            }
+          ]
         }.to_json
       end
 
@@ -39,7 +63,19 @@ RSpec.describe "match_json_schema matcher" do
         {
           id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
           name: "Caroline Mayer",
-          age: 16
+          age: 25,
+          children: [
+            {
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+              name: "Webster Medina",
+              age: 2
+            },
+            {
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+              name: "Roy Mcdaniel",
+              age: 5
+            }
+          ]
         }.to_json
       end
 
@@ -47,7 +83,7 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
-  context "when data typed schema" do
+  context "when data typed given" do
     let(:expected) do
       {
         id: String,
@@ -81,7 +117,7 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
-  context "when custom types" do
+  context "when custom types given" do
     describe "email" do
       let(:expected) do
         { email: Rspec::JsonApi::Types::EMAIL }
@@ -146,6 +182,363 @@ RSpec.describe "match_json_schema matcher" do
 
         include_examples "incorrect-match"
       end
+    end
+  end
+
+  context "when regex given" do
+    let(:expected) do
+      {
+        id: "1",
+        hex: /^\#([a-fA-F]|[0-9]){3,6}$/
+      }
+    end
+
+    context "when correct match" do
+      let(:actual) do
+        {
+          id: "1",
+          hex: "#FF5733"
+        }.to_json
+      end
+
+      include_examples "correct-match"
+    end
+
+    context "when incorrect match" do
+      let(:actual) do
+        {
+          id: "1",
+          hex: "FF?"
+        }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+  end
+
+  context "when array given" do
+    context "when exact match" do
+      let(:expected) do
+        {
+          id: "111",
+          numbers: [1, 5, 2, 4, 3]
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "111",
+            numbers: [1, 5, 2, 4, 3]
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "111",
+            numbers: [1, 5, 2, 4]
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    context "when data type" do
+      let(:expected) do
+        {
+          id: "111",
+          numbers: Array[Integer]
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "111",
+            numbers: [1, 5, 2, 4, 3]
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "111",
+            numbers: [1, 5, 2, 4, "x"]
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+  end
+
+  context "when proc given" do
+    context "when type comparison" do
+      let(:expected) do
+        {
+          id: "123123",
+          color: -> { { type: String } }
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "123123",
+            color: "Blue"
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "111",
+            color: 12.5
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    context "when value comparison" do
+      let(:expected) do
+        {
+          id: "123123",
+          city: -> { { value: "Madrid" } }
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "123123",
+            city: "Madrid"
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "111",
+            city: "Warsaw"
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    context "when inclusion comparison" do
+      let(:expected) do
+        {
+          id: "123123",
+          letter: -> { { inclusion: %w[A B C] } }
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "123123",
+            letter: "A"
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "111",
+            letter: "D"
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    context "when min value comparison" do
+      let(:expected) do
+        {
+          id: "123123",
+          number: -> { { min: 3 } }
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "123123",
+            number: 5
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "123123",
+            number: 2
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    context "when max value comparison" do
+      let(:expected) do
+        {
+          id: "123123",
+          number: -> { { max: 3 } }
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "123123",
+            number: 2
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "123123",
+            number: 5
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    context "when regex comparison" do
+      let(:expected) do
+        {
+          id: "1",
+          hex: -> { { regex: /^\#([a-fA-F]|[0-9]){3,6}$/ } }
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "1",
+            hex: "#FF5733"
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "1",
+            hex: "FF?"
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    context "when custom lambda comparison" do
+      let(:expected) do
+        {
+          id: "1",
+          number: -> { { lambda: ->(actual) { actual.even? } } }
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "1",
+            number: 222
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "1",
+            number: 221
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+  end
+
+  context "when custom interface given" do
+    context "when single interface given" do
+      let(:expected) do
+        {
+          interface: Rspec::JsonApi::Interfaces::EXAMPLE_INTERFACE
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            interface: {
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+              name: "John Smith",
+              number: 9,
+              color: "black"
+            }
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            interface: {
+              id: 33,
+              name: "John Smith",
+              number: 9,
+              color: "black"
+            }
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    context "when array given" do
     end
   end
 

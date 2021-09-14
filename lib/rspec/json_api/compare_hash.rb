@@ -42,7 +42,7 @@ module Rspec
       end
 
       def compare_regexp(actual_value, expected_value)
-        expected_value =~ actual_value
+        actual_value =~ expected_value
       end
 
       def compare_proc(actual_value, expected_value)
