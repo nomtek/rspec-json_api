@@ -8,9 +8,51 @@ RSpec.describe "match_json_schema matcher" do
   end
 
   shared_examples "incorrect-match" do
-    it "does not matche expected schema" do
+    it "does not match expected schema" do
       expect(actual).not_to match_json_schema(expected)
     end
+  end
+
+  context "when schema does not match" do
+    let(:expected) do
+      {
+        id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+        name: "Caroline Mayer",
+        age: 25,
+        children: [
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "Webster Medina",
+            age: 2
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+            name: "Roy Mcdaniel",
+            age: 3
+          }
+        ]
+      }
+    end
+
+    let(:actual) do
+      {
+        id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+        name: "Caroline Mayer",
+        children: [
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "Webster Medina",
+            age: 2
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+            age: 3
+          }
+        ]
+      }.to_json
+    end
+
+    include_examples "incorrect-match"
   end
 
   context "when exact match given" do
@@ -497,6 +539,46 @@ RSpec.describe "match_json_schema matcher" do
         include_examples "incorrect-match"
       end
     end
+
+    context "when allow_blank option set to true" do
+      let(:expected) do
+        {
+          id: "1",
+          name: -> { { value: "John Smith", allow_blank: true } }
+        }
+      end
+
+      context "when correct match" do
+        let(:actual) do
+          {
+            id: "1",
+            name: nil
+          }.to_json
+        end
+
+        include_examples "correct-match"
+      end
+    end
+
+    context "when allow_blank option set to false" do
+      let(:expected) do
+        {
+          id: "1",
+          name: -> { { value: "John Smith", allow_blank: false } }
+        }
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          {
+            id: "1",
+            name: nil
+          }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
   end
 
   context "when custom interface given" do
@@ -539,6 +621,59 @@ RSpec.describe "match_json_schema matcher" do
     end
 
     context "when array given" do
+      context "when single interface given" do
+        let(:expected) do
+          {
+            interfaces: Array[Rspec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+          }
+        end
+
+        context "when correct match" do
+          let(:actual) do
+            {
+              interfaces: [
+                {
+                  id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+                  name: "John Smith",
+                  number: 9,
+                  color: "black"
+                },
+                {
+                  id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+                  name: "John Smith",
+                  number: 9,
+                  color: nil
+                }
+              ]
+            }.to_json
+          end
+
+          include_examples "correct-match"
+        end
+
+        context "when incorrect match" do
+          let(:actual) do
+            {
+              interfaces: [
+                {
+                  id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+                  name: "Anna Smith",
+                  number: 9,
+                  color: "white"
+                },
+                {
+                  id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+                  name: "John Smith",
+                  number: "AAA",
+                  color: "black"
+                }
+              ]
+            }.to_json
+          end
+
+          include_examples "incorrect-match"
+        end
+      end
     end
   end
 
