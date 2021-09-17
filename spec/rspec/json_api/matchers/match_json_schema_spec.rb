@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "rspec/json_api/interfaces/example_interface"
+
 RSpec.describe "match_json_schema matcher" do
   shared_examples "correct-match" do
     it "matches expected schema" do

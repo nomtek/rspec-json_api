@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-module RSpec
+module Rspec
   module JsonApi
     module Generators
       class InstallGenerator < Rails::Generators::Base
         source_root File.expand_path("templates", __dir__)
 
         def create_dir_scaffold
-          directory "rspec"
+          directory "rspec", "spec/rspec/json_api"
         end
       end
     end
