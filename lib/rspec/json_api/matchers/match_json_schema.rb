@@ -1,16 +1,25 @@
-# frozen_string_literal: true
+module RSpec
+  module JsonApi
+    module Matchers
+      class MatchJsonSchema
+        attr_reader :expected
 
-RSpec::Matchers.define :match_json_schema do |expected|
-  match do |actual|
-    # Parse JSON object into hash
-    actual = ::JSON.parse(actual, symbolize_names: true)
+        def initialize(expected)
+          @expected = expected
+        end
 
-    # Compare keys schema
-    return false unless actual.deep_keys == expected.deep_keys
+        def matches?(actual)
+          actual = JSON.parse(actual, symbolize_names: true)
 
-    # Compare respond with gicen schema
-    return false unless RSpec::JsonApi::CompareHash.compare(actual, expected)
+          # Compare keys schema
+          return false unless actual.deep_keys == expected.deep_keys
 
-    true
+          # Compare respond with gicen schema
+          return false unless RSpec::JsonApi::CompareHash.compare(actual, expected)
+
+          true
+        end
+      end
+    end
   end
 end

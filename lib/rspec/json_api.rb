@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # Load 3th party libraries
+require "rspec/matchers"
 require "json"
 require "active_support/core_ext/object/blank"
 
@@ -10,6 +11,7 @@ require "rspec/json_api/version"
 require "rspec/json_api/compare_hash"
 
 # Load matcher
+require "rspec/json_api/matchers"
 require "rspec/json_api/matchers/match_json_schema"
 
 # Load defined types
