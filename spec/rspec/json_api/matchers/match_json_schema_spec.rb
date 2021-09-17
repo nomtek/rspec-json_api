@@ -162,7 +162,7 @@ RSpec.describe "match_json_schema matcher" do
   context "when custom types given" do
     describe "email" do
       let(:expected) do
-        { email: Rspec::JsonApi::Types::EMAIL }
+        { email: RSpec::JsonApi::Types::EMAIL }
       end
 
       context "when correct match" do
@@ -184,7 +184,7 @@ RSpec.describe "match_json_schema matcher" do
 
     describe "uri" do
       let(:expected) do
-        { uri: Rspec::JsonApi::Types::URI }
+        { uri: RSpec::JsonApi::Types::URI }
       end
 
       context "when correct match" do
@@ -206,7 +206,7 @@ RSpec.describe "match_json_schema matcher" do
 
     describe "uuid" do
       let(:expected) do
-        { uuid: Rspec::JsonApi::Types::UUID }
+        { uuid: RSpec::JsonApi::Types::UUID }
       end
 
       context "when correct match" do
@@ -585,7 +585,7 @@ RSpec.describe "match_json_schema matcher" do
     context "when single interface given" do
       let(:expected) do
         {
-          interface: Rspec::JsonApi::Interfaces::EXAMPLE_INTERFACE
+          interface: RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE
         }
       end
 
@@ -624,7 +624,7 @@ RSpec.describe "match_json_schema matcher" do
       context "when single interface given" do
         let(:expected) do
           {
-            interfaces: Array[Rspec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+            interfaces: Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
           }
         end
 
@@ -733,22 +733,22 @@ RSpec.describe "match_json_schema matcher" do
 
     let(:expected) do
       {
-        id: Rspec::JsonApi::Types::UUID,
+        id: RSpec::JsonApi::Types::UUID,
         name: "Michal",
-        example: Rspec::JsonApi::Interfaces::EXAMPLE_INTERFACE,
-        examples: Array[Rspec::JsonApi::Interfaces::EXAMPLE_INTERFACE],
+        example: RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE,
+        examples: Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE],
         not_interfaces_array: [
           {
             hash_array: [
               { id: "123123123" },
-              { uuid: Rspec::JsonApi::Types::UUID }
+              { uuid: RSpec::JsonApi::Types::UUID }
             ]
           },
-          { id: Rspec::JsonApi::Types::UUID },
+          { id: RSpec::JsonApi::Types::UUID },
           {},
           Array[]
         ],
-        email: Rspec::JsonApi::Types::EMAIL,
+        email: RSpec::JsonApi::Types::EMAIL,
         sex: -> { { inclusion: %w[Male Female] } },
         height: -> { { type: Integer, lambda: ->(actual) { actual.even? } } },
         age: -> { { type: Integer, min: 1, max: 100, allow_blank: false } },

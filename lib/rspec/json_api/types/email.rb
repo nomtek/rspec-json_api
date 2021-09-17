@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Rspec
+module RSpec
   module JsonApi
     module Types
       EMAIL = URI::MailTo::EMAIL_REGEXP

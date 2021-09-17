@@ -4,11 +4,11 @@ require_relative "lib/rspec/json_api/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "rspec-json_api"
-  spec.version       = Rspec::JsonApi::VERSION
+  spec.version       = RSpec::JsonApi::VERSION
   spec.authors       = ["Michal Gajowiak"]
   spec.email         = ["m.gajowiak@nomtek.com"]
 
-  spec.summary       = "Rspec extension to test JSON API response."
+  spec.summary       = "RSpec extension to test JSON API response."
   spec.homepage      = "https://github.com/nomtek/rspec-json_api"
   spec.license       = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 3.0.0")
@@ -27,8 +27,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "activesupport", "~> 5.0"
-  spec.add_dependency "rspec-rails", "~> 5.0"
+  spec.add_dependency "activesupport", "~> 6.1", ">= 6.1.4.1"
+  spec.add_dependency "rails", "~> 6.1", ">= 6.1.4.1"
+  spec.add_dependency "rspec-rails", "~> 5.0", ">= 5.0.2"
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html

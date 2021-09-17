@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Rspec
+module RSpec
   module JsonApi
     module Types
       URI = URI::DEFAULT_PARSER.make_regexp
