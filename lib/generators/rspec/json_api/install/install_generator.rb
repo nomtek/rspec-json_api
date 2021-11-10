@@ -7,7 +7,7 @@ module Rspec
         source_root File.expand_path("templates", __dir__)
 
         def create_dir_scaffold
-          directory "rspec", "spec/rspec/json_api"
+          directory "rspec", "spec/rspec"
         end
       end
     end

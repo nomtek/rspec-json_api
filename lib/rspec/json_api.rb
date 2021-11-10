@@ -7,6 +7,7 @@ require "active_support/core_ext/object/blank"
 # Load the json_api parts
 require "rspec/json_api/version"
 require "rspec/json_api/compare_hash"
+require "rspec/json_api/compare_array"
 
 # Load extentions
 require "extentions/hash"

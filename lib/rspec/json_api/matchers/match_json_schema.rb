@@ -13,13 +13,25 @@ module RSpec
         def matches?(actual)
           actual = JSON.parse(actual, symbolize_names: true)
 
-          # Compare actual and expected hashes schema
-          return false unless actual.deep_keys == expected.deep_keys
+          # Compare types
+          return false unless actual.instance_of?(expected.class)
 
-          # Compare actual and expected hashes
-          return false unless RSpec::JsonApi::CompareHash.compare(actual, expected)
+          if expected.instance_of?(Array)
+            RSpec::JsonApi::CompareArray.compare(actual, expected)
+          else
+            # Compare actual and expected schema
+            return false unless actual.deep_keys == expected.deep_keys
 
-          true
+            RSpec::JsonApi::CompareHash.compare(actual, expected)
+          end
+        end
+
+        def failure_message
+          self
+        end
+
+        def failure_message_when_negated
+          self
         end
       end
     end

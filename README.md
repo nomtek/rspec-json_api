@@ -1,8 +1,6 @@
 # RSpec::JsonApi
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rspec/json_api`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+RSpec:JsonAPI is an extension for RSpec to easily allow to test JSON API responses.
 
 ## Installation
 
@@ -20,9 +18,48 @@ Or install it yourself as:
 
     $ gem install rspec-json_api
 
-## Usage
+Generate directory tree:
 
-TODO: Write usage instructions here
+    rails generate rspec:json_api:install
+
+## Generators
+
+Using build-in generators it's possible to create eaither custom interface or type.
+
+Generate new template:
+
+    rails generate rspec:json_api:interface interface-name
+
+Generate new type:
+
+    rails generate rspec:json_api:types type-name
+
+
+## Example usage
+
+```ruby
+RSpec.describe UsersController, type: :controller do
+  describe '#index' do
+    let(:expected_schema) do
+      Array[{
+        id: RSpec::JsonApi::Types::UUID,
+        name: String,
+        age: Integer,
+        favouriteColorHex: /^\#([a-fA-F]|[0-9]){3,6}$/
+      }]
+    end
+
+    it 'matches API response' do
+      get :index
+
+      expect(response.body).to match_json_schema(expected_schema)
+    end
+  end
+end
+```
+
+## Built-in matchers
+
 
 ## Development
 
@@ -32,7 +69,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/rspec-json_api. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/rspec-json_api/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/nomtek/rspec-json_api. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/rspec-json_api/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
