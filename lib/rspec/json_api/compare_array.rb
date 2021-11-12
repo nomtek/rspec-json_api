@@ -7,18 +7,18 @@ module RSpec
 
       def compare(actual, expected)
         if interface?(expected)
-          actual.each do |actual_elem|
+          actual.all? do |actual_elem|
             # Compare actual and expected schema
             return false unless actual_elem.deep_keys == expected[0].deep_keys
 
-            return CompareHash.compare(actual_elem, expected[0])
+            CompareHash.compare(actual_elem, expected[0])
           end
         else
-          actual.each_with_index do |actual_elem, index|
+          actual.each_with_index.all? do |actual_elem, index|
             # Compare actual and expected schema
             return false unless actual[index].deep_keys == expected[index].deep_keys
 
-            return CompareHash.compare(actual_elem[index], expected[index])
+            CompareHash.compare(actual_elem, expected[index])
           end
         end
       end

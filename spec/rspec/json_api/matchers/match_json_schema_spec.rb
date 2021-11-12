@@ -770,4 +770,119 @@ RSpec.describe "match_json_schema matcher" do
 
     include_examples "correct-match"
   end
+
+  context "when JSON schema is array" do
+    context "when exact match expeceted" do
+      context "when correct match" do
+        let(:actual) do
+          [
+            {
+              id: "100",
+              name: "blue"
+            },
+            {
+              id: "101",
+              name: "red"
+            }
+          ].to_json
+        end
+
+        let(:expected) do
+          [
+            {
+              id: "100",
+              name: "blue"
+            },
+            {
+              id: "101",
+              name: "red"
+            }
+          ]
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          [
+            {
+              id: "100",
+              name: "blue"
+            },
+            {
+              id: "101",
+              name: "red"
+            }
+          ].to_json
+        end
+
+        let(:expected) do
+          [
+            {
+              id: "100",
+              name: "blue"
+            },
+            {
+              id: "101",
+              name: "yellow"
+            }
+          ]
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+
+    context "when shema expected" do
+      context "when correct match" do
+        let(:actual) do
+          [
+            {
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+              name: "John Smith",
+              number: 9,
+              color: "black"
+            },
+            {
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+              name: "John Smith",
+              number: 9,
+              color: nil
+            }
+          ].to_json
+        end
+
+        let(:expected) do
+          Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+        end
+
+        include_examples "correct-match"
+      end
+
+      context "when incorrect match" do
+        let(:actual) do
+          [
+            {
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+              name: "John Smith",
+              number: 9,
+              color: "black"
+            },
+            {
+              name: "John Smith",
+              number: 9,
+              color: nil
+            }
+          ].to_json
+        end
+
+        let(:expected) do
+          Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+        end
+
+        include_examples "incorrect-match"
+      end
+    end
+  end
 end

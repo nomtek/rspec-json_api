@@ -24,7 +24,7 @@ Generate directory tree:
 
 ## Generators
 
-Using build-in generators it's possible to create eaither custom interface or type.
+Using build-in generators it's possible to create custom interface and type.
 
 Generate new template:
 
@@ -59,6 +59,19 @@ end
 ```
 
 ## Built-in matchers
+- ### match_json_schema
+```
+  expect(response.body).to match_json_schema(expected_schema)
+```
+
+## Interfaces
+
+## Types
+
+## Build-in types
+- #### EMAIL
+- #### URI
+- #### UUID
 
 
 ## Development
