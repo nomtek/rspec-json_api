@@ -26,7 +26,8 @@ Generate directory tree:
 
 Require gem assets in your `spec_helper.rb`
 ```ruby
-Dir[File.join(__dir__, 'rspec', 'json_api', '**', '*.rb')].each { |file| require file }
+Dir[File.join(__dir__, 'rspec', 'json_api', 'types', '*.rb')].each { |file| require file }
+Dir[File.join(__dir__, 'rspec', 'json_api', 'interfaces', '*.rb')].each { |file| require file }
 ```
 
 ## Generators
