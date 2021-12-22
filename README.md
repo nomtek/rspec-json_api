@@ -39,7 +39,7 @@ Generate new template:
 
 Generate new type:
 
-    rails generate rspec:json_api:types type-name
+    rails generate rspec:json_api:type type-name
 
 
 ## Example usage
