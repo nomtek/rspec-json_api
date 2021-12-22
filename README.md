@@ -225,7 +225,7 @@ end
 Proc match allows to customize schema accoring needs using lambda shorthand notation `->`
 
 Supported options:
-- ####type
+- #### type
 ```ruby
 let(:expected_schema) do
   {
@@ -233,7 +233,7 @@ let(:expected_schema) do
   }
 end
 ```
-- ####value
+- #### value
 ```ruby
 let(:expected_schema) do
   {
@@ -241,7 +241,7 @@ let(:expected_schema) do
   }
 end
 ```
-- ####min
+- #### min
 ```ruby
 let(:expected_schema) do
   {
@@ -249,7 +249,7 @@ let(:expected_schema) do
   }
 end
 ```
-- ####max
+- #### max
 ```ruby
 let(:expected_schema) do
   {
@@ -257,7 +257,7 @@ let(:expected_schema) do
   }
 end
 ```
-- ####inclusion
+- #### inclusion
 ```ruby
 let(:expected_schema) do
   {
@@ -265,7 +265,7 @@ let(:expected_schema) do
   }
 end
 ```
-- ####regex
+- #### regex
 ```ruby
 let(:expected_schema) do
   {
@@ -273,7 +273,7 @@ let(:expected_schema) do
   }
 end
 ```
-- ####lambda
+- #### lambda
 ```ruby
 let(:expected) do
   {
@@ -281,7 +281,7 @@ let(:expected) do
   }
 end
 ```
-- ####allow_blank
+- #### allow_blank
 
 ```ruby
 let(:expected_schema) do
