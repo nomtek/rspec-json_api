@@ -2,7 +2,7 @@
 
 [RSpec:JsonAPI](https://github.com/nomtek/rspec-json_api) 
 is an extension for [RSpec](https://github.com/rspec) 
-to easily allow to test JSON API responses.
+to easily allow testing JSON API responses.
 
 ## Installation
 
