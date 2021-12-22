@@ -63,11 +63,11 @@ module RSpec
           when :inclusion
             condition_value.include?(actual_value)
           when :min
-            return false unless condition_value.is_a?(Numeric)
+            return false if !condition_value.is_a?(Numeric) || !actual_value.is_a?(Numeric)
 
             actual_value >= condition_value
           when :max
-            return false unless condition_value.is_a?(Numeric)
+            return false if !condition_value.is_a?(Numeric) || !actual_value.is_a?(Numeric)
 
             actual_value <= condition_value
           when :regex

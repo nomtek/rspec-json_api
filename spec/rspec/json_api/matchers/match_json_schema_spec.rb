@@ -835,6 +835,18 @@ RSpec.describe "match_json_schema matcher" do
     end
 
     context "when shema expected" do
+      context "when empty array" do
+        let(:actual) do
+          [].to_json
+        end
+
+        let(:expected) do
+          Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+        end
+
+        include_examples "correct-match"
+      end
+
       context "when correct match" do
         let(:actual) do
           [

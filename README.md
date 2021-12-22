@@ -1,6 +1,8 @@
 # RSpec::JsonApi
 
-RSpec:JsonAPI is an extension for RSpec to easily allow to test JSON API responses.
+[RSpec:JsonAPI](https://github.com/nomtek/rspec-json_api) 
+is an extension for [RSpec](https://github.com/rspec) 
+to easily allow to test JSON API responses.
 
 ## Installation
 
@@ -22,6 +24,11 @@ Generate directory tree:
 
     rails generate rspec:json_api:install
 
+Require gem assets in your `spec_helper.rb`
+```ruby
+Dir[File.join(__dir__, 'rspec', 'json_api', '**', '*.rb')].each { |file| require file }
+```
+
 ## Generators
 
 Using build-in generators it's possible to create custom interface and type.
@@ -38,6 +45,8 @@ Generate new type:
 ## Example usage
 
 ```ruby
+# spec/controllers/users_controller_spec.rb
+
 RSpec.describe UsersController, type: :controller do
   describe '#index' do
     let(:expected_schema) do
@@ -45,7 +54,8 @@ RSpec.describe UsersController, type: :controller do
         id: RSpec::JsonApi::Types::UUID,
         name: String,
         age: Integer,
-        favouriteColorHex: /^\#([a-fA-F]|[0-9]){3,6}$/
+        favouriteColorHex: /^\#([a-fA-F]|[0-9]){3,6}$/,
+        number: -> { { type: Integer, min: 10, max: 20, lambda: ->(actual) { actual.even? } } }
       }]
     end
 
@@ -65,20 +75,221 @@ end
 ```
 
 ## Interfaces
+The gem introduces interfaces to reuse them during test matches.
 
+```ruby
+# spec/rspec/json_api/interfaces/example_interface.rb
+
+module RSpec
+  module JsonApi
+    module Interfaces
+      EXAMPLE_INTERFACE = {
+        id: Types::UUID,
+        name: String,
+        number: Integer,
+        color: -> { { inclusion: %w[black red white], allow_blank: true } }
+      }.freeze
+    end
+  end
+end
+```
+_Note: You can either generate file on your own or use generator._
 ## Types
 
-## Build-in types
+The gem allow users either to user build-in types or define owns. 
+### Build-in types
 - #### EMAIL
+```ruby
+RSpec::JsonApi::Types::EMAIL
+```
 - #### URI
+```ruby
+RSpec::JsonApi::Types::URI
+```
 - #### UUID
+```ruby
+RSpec::JsonApi::Types::UUID
+```
 
 
-## Development
+Custom type example:
+```ruby
+# spec/rspec/json_api/types/color_hex.rb
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+module RSpec
+  module JsonApi
+    module Types
+      COLOR_HEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+    end
+  end
+end
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+RSpec::JsonApi::Types::COLOR_HEX
+```
+
+_Note: You can either generate file on your own or use generator._
+## Matching methods
+The gem offers variety of possible matching methods.
+
+### Presumptions
+- `match_json_schema` always require full keys match.
+
+  Failure Example:
+    ```ruby
+    let(:expected) do
+      {
+        id: RSpec::JsonApi::Types::UUID,
+        name: String,
+        age: Integer
+      }
+    end
+  
+    let(:actual) do
+      {
+        id: "0a2f911f-3767-4cc7-9c19-049f4350e38c",
+        name: "Mikel",
+      }
+    end
+    ```
+  
+  Success Example:
+  ```ruby
+  let(:expected) do
+    {
+      id: RSpec::JsonApi::Types::UUID,
+      name: String,
+      age: Integer
+    }
+  end
+
+  let(:actual) do
+    {
+      id: "0a2f911f-3767-4cc7-9c19-049f4350e38c",
+      name: "John",
+      age: 24
+    }
+  end
+  ```
+
+### Value match
+```ruby
+let(:expected_schema) do
+  {
+    id: "e0067346-4d24-4aa6-b303-f927a410a001",
+    name: "John",
+    age: 24,
+    favouriteColorHex: "#FF5733"
+  }
+end
+```
+
+### Class match
+```ruby
+let(:expected_schema) do
+  {
+    id: Integer,
+    name: String,
+    age: Integer,
+    notes: Array[String]
+  }
+end
+```
+
+### Type match
+```ruby
+let(:expected_schema) do
+  {
+    id: RSpec::JsonApi::Types::UUID,
+    email: RSpec::JsonApi::Types::EMAIL,
+  }
+end
+```
+
+### Regexp match
+```ruby
+let(:expected_schema) do
+  {
+    color: /^\#([a-fA-F]|[0-9]){3,6}$/
+  }
+end
+```
+
+### Interface match
+```ruby
+let(:expected_schema) do
+    Array[RSpec::JsonApi::Interfaces::PERSON]
+end
+```
+
+### Proc match
+Proc match allows to customize schema accoring needs using lambda shorthand notation `->`
+
+Supported options:
+- ####type
+```ruby
+let(:expected_schema) do
+  {
+    name: -> { { type: String } }
+  }
+end
+```
+- ####value
+```ruby
+let(:expected_schema) do
+  {
+    name: -> { { value: "John" } }
+  }
+end
+```
+- ####min
+```ruby
+let(:expected_schema) do
+  {
+    age: -> { { min: 15 } }
+  }
+end
+```
+- ####max
+```ruby
+let(:expected_schema) do
+  {
+    age: -> { { max: 25 } }
+  }
+end
+```
+- ####inclusion
+```ruby
+let(:expected_schema) do
+  {
+    letter: -> { { inclusion: %w[A B C] } }
+  }
+end
+```
+- ####regex
+```ruby
+let(:expected_schema) do
+  {
+    hex: -> { { regex: /^\#([a-fA-F]|[0-9]){3,6}$/ } }
+  }
+end
+```
+- ####lambda
+```ruby
+let(:expected) do
+  {
+    number: -> { { lambda: ->(actual) { actual.even? } } }
+  }
+end
+```
+- ####allow_blank
+
+```ruby
+let(:expected_schema) do
+  {
+    name: -> { { type: String, allow_blank: false } }
+  }
+end
+```
 
 ## Contributing
 
