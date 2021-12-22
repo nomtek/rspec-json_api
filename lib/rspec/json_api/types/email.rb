@@ -2,6 +2,8 @@
 
 module RSpec
   module JsonApi
-    VERSION = "0.0.1"
+    module Types
+      EMAIL = URI::MailTo::EMAIL_REGEXP
+    end
   end
 end

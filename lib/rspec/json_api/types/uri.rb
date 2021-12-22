@@ -2,6 +2,8 @@
 
 module RSpec
   module JsonApi
-    VERSION = "0.0.1"
+    module Types
+      URI = URI::DEFAULT_PARSER.make_regexp
+    end
   end
 end
