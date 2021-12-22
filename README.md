@@ -286,10 +286,11 @@ end
 ```ruby
 let(:expected_schema) do
   {
-    name: -> { { type: String, allow_blank: false } }
+    name: -> { { type: String, allow_blank: true } }
   }
 end
 ```
+_Note: Default value is `false`_
 
 ## Contributing
 
