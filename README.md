@@ -24,7 +24,7 @@ Generate directory tree:
 
     rails generate rspec:json_api:install
 
-Require gem assets in your `spec_helper.rb`
+Require gem assets in your `rails_helper.rb`
 ```ruby
 Dir[File.join(__dir__, 'rspec', 'json_api', 'types', '*.rb')].each { |file| require file }
 Dir[File.join(__dir__, 'rspec', 'json_api', 'interfaces', '*.rb')].each { |file| require file }
