@@ -57,6 +57,96 @@ RSpec.describe "match_json_schema matcher" do
     include_examples "incorrect-match"
   end
 
+  context "when redundant argument in expected nested array" do
+    let(:expected) do
+      {
+        id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+        name: "Caroline Mayer",
+        age: 25,
+        children: [
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "Webster Medina",
+            fav_numbers: [1,2,5],
+            age: 2,
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+            name: "Roy Mcdaniel",
+            age: 3
+          }
+        ]
+      }
+    end
+
+    let(:actual) do
+      {
+        id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+        name: "Caroline Mayer",
+        age: 25,
+        children: [
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "Webster Medina",
+            age: 2
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+            name: "Roy Mcdaniel",
+            age: 3
+          }
+        ]
+      }.to_json
+    end
+
+    include_examples "incorrect-match"
+  end
+
+  context "when redundant argument in actual nested array" do
+    let(:expected) do
+      {
+        id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+        name: "Caroline Mayer",
+        age: 25,
+        children: [
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "Webster Medina",
+            age: 2
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+            name: "Roy Mcdaniel",
+            age: 3
+          }
+        ]
+      }
+    end
+
+    let(:actual) do
+      {
+        id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+        name: "Caroline Mayer",
+        age: 25,
+        children: [
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "Webster Medina",
+            sex: "Male",
+            age: 2
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+            name: "Roy Mcdaniel",
+            age: 3
+          }
+        ]
+      }.to_json
+    end
+
+    include_examples "incorrect-match"
+  end
+
   context "when exact match given" do
     let(:expected) do
       {
@@ -726,7 +816,7 @@ RSpec.describe "match_json_schema matcher" do
             city: [1, 2, 3],
             zip: {
               sym: "PL",
-              code: ["+48", "0048"]
+              code: %w[+48 0048]
             }
           }
         }
@@ -761,7 +851,7 @@ RSpec.describe "match_json_schema matcher" do
             city: Array[Integer],
             zip: {
               sym: "PL",
-              code: ["+48", "0048"]
+              code: %w[+48 0048]
             }
           }
         }

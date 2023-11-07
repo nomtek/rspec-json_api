@@ -10,17 +10,21 @@ module RSpec
       def compare(actual, expected)
         return false if actual.blank? && expected.present?
 
-        key_paths = actual.deep_key_paths
+        keys = expected.deep_key_paths | actual.deep_key_paths
 
-        key_paths.all? do |key_path|
+        compare_key_paths_and_values(keys, actual, expected)
+      end
+
+      private
+
+      def compare_key_paths_and_values(keys, actual, expected)
+        keys.all? do |key_path|
           actual_value = actual.dig(*key_path)
           expected_value = expected.dig(*key_path)
 
           compare_hash_values(actual_value, expected_value)
         end
       end
-
-      private
 
       def compare_hash_values(actual_value, expected_value)
         case expected_value
@@ -42,7 +46,7 @@ module RSpec
       end
 
       def compare_regexp(actual_value, expected_value)
-        actual_value =~ expected_value
+        actual_value.to_s =~ expected_value
       end
 
       def compare_proc(actual_value, expected_value)
@@ -88,10 +92,10 @@ module RSpec
 
           actual_value.all? { |elem| compare(elem, interface) }
         else
-          return false if actual_value.size != expected_value.size
+          return false if actual_value&.size != expected_value&.size
 
-          actual_value.each_with_index.all? do |elem, index|
-            elem.is_a?(Hash) ? compare(elem, expected_value[index]) : compare_value(elem, expected_value[index])
+          expected_value.each_with_index.all? do |elem, index|
+            elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_value(actual_value[index], elem)
           end
         end
       end

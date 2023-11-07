@@ -9,5 +9,3 @@ gemspec
 gem "activesupport", "~> 6.1", ">= 6.1.4.1"
 gem "rake", "~> 13.0", ">= 13.0.6"
 gem "rspec-rails", "~> 5.0", ">= 5.0.2"
-
-
