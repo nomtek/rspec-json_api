@@ -67,8 +67,8 @@ RSpec.describe "match_json_schema matcher" do
           {
             id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
             name: "Webster Medina",
-            fav_numbers: [1,2,5],
-            age: 2,
+            fav_numbers: [1, 2, 5],
+            age: 2
           },
           {
             id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
