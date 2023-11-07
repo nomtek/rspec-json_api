@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Extention methods for hash class
+# Extension methods for hash class
 class Hash
   def deep_keys
     each_with_object([]) do |(k, v), keys|
