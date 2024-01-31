@@ -66,6 +66,14 @@ RSpec.describe UsersController, type: :controller do
       expect(response.body).to match_json_schema(expected_schema)
     end
   end
+  
+  describe '#update' do
+    it 'matches API response' do
+      put :update, params: { name: 'John', age: 35 }
+      
+      expect(response.body).to have_no_content
+    end
+  end
 end
 ```
 
@@ -73,6 +81,11 @@ end
 - ### match_json_schema
 ```
   expect(response.body).to match_json_schema(expected_schema)
+```
+
+- ### have_no_content
+```
+  expect(response.body).to have_no_content
 ```
 
 ## Interfaces

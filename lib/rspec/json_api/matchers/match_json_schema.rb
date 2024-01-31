@@ -11,6 +11,7 @@ module RSpec
         end
 
         def matches?(actual)
+          # Parse JSON to ruby object
           actual = JSON.parse(actual, symbolize_names: true)
 
           # Compare types
