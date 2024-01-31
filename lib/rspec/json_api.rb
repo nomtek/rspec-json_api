@@ -15,6 +15,7 @@ require "extentions/hash"
 # Load matchers
 require "rspec/json_api/matchers"
 require "rspec/json_api/matchers/match_json_schema"
+require "rspec/json_api/matchers/have_no_content"
 
 # Load defined types
 require "rspec/json_api/types/email"

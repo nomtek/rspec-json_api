@@ -323,7 +323,7 @@ RSpec.describe "match_json_schema matcher" do
     let(:expected) do
       {
         id: "1",
-        hex: /^\#([a-fA-F]|[0-9]){3,6}$/
+        hex: /^#([a-fA-F]|[0-9]){3,6}$/
       }
     end
 
@@ -862,7 +862,7 @@ RSpec.describe "match_json_schema matcher" do
   end
 
   context "when JSON schema is array" do
-    context "when exact match expeceted" do
+    context "when exact match expected" do
       context "when correct match" do
         let(:actual) do
           [
@@ -924,7 +924,7 @@ RSpec.describe "match_json_schema matcher" do
       end
     end
 
-    context "when shema expected" do
+    context "when schema expected" do
       context "when empty array" do
         let(:actual) do
           [].to_json
