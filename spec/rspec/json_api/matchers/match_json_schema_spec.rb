@@ -987,4 +987,30 @@ RSpec.describe "match_json_schema matcher" do
       end
     end
   end
+
+  context "when JSON schema is array of primitive types" do
+    context "when correct match" do
+      let(:actual) do
+        ["string", 1].to_json
+      end
+
+      let(:expected) do
+        ["string", 1]
+      end
+
+      include_examples "correct-match"
+    end
+
+    context "when incorrect match" do
+      let(:actual) do
+        ["string", 1].to_json
+      end
+
+      let(:expected) do
+        ["string2", 1]
+      end
+
+      include_examples "incorrect-match"
+    end
+  end
 end

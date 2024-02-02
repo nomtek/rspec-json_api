@@ -15,18 +15,16 @@ module RSpec
         compare_key_paths_and_values(keys, actual, expected)
       end
 
-      private
-
       def compare_key_paths_and_values(keys, actual, expected)
         keys.all? do |key_path|
           actual_value = actual.dig(*key_path)
           expected_value = expected.dig(*key_path)
 
-          compare_hash_values(actual_value, expected_value)
+          compare_values(actual_value, expected_value)
         end
       end
 
-      def compare_hash_values(actual_value, expected_value)
+      def compare_values(actual_value, expected_value)
         case expected_value
         when Class
           compare_class(actual_value, expected_value)
@@ -37,7 +35,7 @@ module RSpec
         when Array
           compare_array(actual_value, expected_value)
         else
-          compare_value(actual_value, expected_value)
+          compare_simple_value(actual_value, expected_value)
         end
       end
 
@@ -63,7 +61,7 @@ module RSpec
           when :type
             compare_class(actual_value, condition_value)
           when :value
-            compare_value(actual_value, condition_value)
+            compare_simple_value(actual_value, condition_value)
           when :inclusion
             condition_value.include?(actual_value)
           when :min
@@ -95,12 +93,12 @@ module RSpec
           return false if actual_value&.size != expected_value&.size
 
           expected_value.each_with_index.all? do |elem, index|
-            elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_value(actual_value[index], elem)
+            elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_simple_value(actual_value[index], elem)
           end
         end
       end
 
-      def compare_value(actual_value, expected_value)
+      def compare_simple_value(actual_value, expected_value)
         actual_value == expected_value
       end
 
