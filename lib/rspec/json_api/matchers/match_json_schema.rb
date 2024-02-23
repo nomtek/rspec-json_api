@@ -21,7 +21,7 @@ module RSpec
             RSpec::JsonApi::CompareArray.compare(actual, expected)
           else
             # Compare actual and expected schema
-            return false unless actual.deep_keys == expected.deep_keys
+            return false unless actual.deep_keys.deep_sort == expected.deep_keys.deep_sort
 
             RSpec::JsonApi::CompareHash.compare(actual, expected)
           end
