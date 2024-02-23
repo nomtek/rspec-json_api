@@ -217,6 +217,52 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
+  context 'when keys are in arbitrary order' do
+    let(:expected) do
+      {
+        id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+        name: "Caroline Mayer",
+        age: 25,
+        children: [
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            name: "Webster Medina",
+            age: 2
+          },
+          {
+            id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+            name: "Roy Mcdaniel",
+            age: 3
+          }
+        ]
+      }
+    end
+
+    context "when correct match" do
+      let(:actual) do
+        {
+          name: "Caroline Mayer",
+          age: 25,
+          id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
+          children: [
+            {
+              name: "Webster Medina",
+              age: 2,
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+            },
+            {
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+              name: "Roy Mcdaniel",
+              age: 3
+            }
+          ]
+        }.to_json
+      end
+
+      include_examples "correct-match"
+    end
+  end
+
   context "when data typed given" do
     let(:expected) do
       {

@@ -11,6 +11,7 @@ require "rspec/json_api/compare_array"
 
 # Load extentions
 require "extentions/hash"
+require "extentions/array"
 
 # Load matchers
 require "rspec/json_api/matchers"
