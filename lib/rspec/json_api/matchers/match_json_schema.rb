@@ -4,7 +4,7 @@ module RSpec
   module JsonApi
     module Matchers
       class MatchJsonSchema
-        attr_reader :expected
+        attr_reader :expected, :actual
 
         def initialize(expected)
           @expected = expected
@@ -12,23 +12,30 @@ module RSpec
 
         def matches?(actual)
           # Parse JSON to ruby object
-          actual = JSON.parse(actual, symbolize_names: true)
+          @actual = JSON.parse(actual, symbolize_names: true)
+          @diff = Diffy::Diff.new(expected, @actual, context: 5)
 
           # Compare types
-          return false unless actual.instance_of?(expected.class)
+          return false unless @actual.instance_of?(expected.class)
 
           if expected.instance_of?(Array)
-            RSpec::JsonApi::CompareArray.compare(actual, expected)
+            RSpec::JsonApi::CompareArray.compare(@actual, expected)
           else
             # Compare actual and expected schema
-            return false unless actual.deep_keys.deep_sort == expected.deep_keys.deep_sort
+            return false unless @actual.deep_keys.deep_sort == expected.deep_keys.deep_sort
 
-            RSpec::JsonApi::CompareHash.compare(actual, expected)
+            RSpec::JsonApi::CompareHash.compare(@actual, expected)
           end
         end
 
         def failure_message
-          self
+          <<~MSG
+            expected: #{expected}
+                 got: #{actual}
+
+            Diff:
+            #{@diff}
+          MSG
         end
 
         def failure_message_when_negated
