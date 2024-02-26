@@ -2,6 +2,7 @@
 
 # Load 3th party libraries
 require "json"
+require "diffy"
 require "active_support/core_ext/object/blank"
 
 # Load the json_api parts
