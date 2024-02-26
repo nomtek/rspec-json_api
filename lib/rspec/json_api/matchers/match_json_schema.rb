@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-# RSpec module serving as a namespace.
 module RSpec
-  # JsonApi module for JSON API related matchers and utilities.
   module JsonApi
-    # Matchers module containing various matchers for testing JSON APIs.
     module Matchers
       # MatchJsonSchema class is designed to match a given JSON against a predefined JSON schema.
       #
