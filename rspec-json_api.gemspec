@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "activesupport", ">= 6.1.4.1"
+  spec.add_dependency "diffy", ">= 3.4.2"
   spec.add_dependency "rails", ">= 6.1.4.1"
   spec.add_dependency "rspec-rails", ">= 5.0.2"
 
