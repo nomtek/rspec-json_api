@@ -40,6 +40,7 @@ RSpec.describe "match_json_schema matcher" do
       {
         id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f",
         name: "Caroline Mayer",
+        age: 25,
         children: [
           {
             id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
@@ -48,6 +49,7 @@ RSpec.describe "match_json_schema matcher" do
           },
           {
             id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
+            name: "Roy Mcdaniel",
             age: 3
           }
         ]
