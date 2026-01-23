@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Bundler version: 4.0.4 (see Gemfile.lock BUNDLED WITH section)
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
