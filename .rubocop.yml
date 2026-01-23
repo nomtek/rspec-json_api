@@ -2,6 +2,8 @@ AllCops:
   TargetRubyVersion: 3.2
   NewCops: enable
   SuggestExtensions: false
+  Exclude:
+    - "README.md"
 
 Style/StringLiterals:
   Enabled: true
@@ -21,7 +23,7 @@ Metrics/BlockLength:
 Metrics/MethodLength:
   Exclude:
     - "lib/rspec/json_api/compare_hash.rb"
-    - "lib/extentions/hash.rb"
+    - "lib/extensions/hash.rb"
 
 Metrics/AbcSize:
   Exclude:

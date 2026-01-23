@@ -51,7 +51,7 @@ Generate new type:
 RSpec.describe UsersController, type: :controller do
   describe '#index' do
     let(:expected_schema) do
-      Array[{
+      [{
         id: RSpec::JsonApi::Types::UUID,
         name: String,
         age: Integer,
@@ -204,7 +204,7 @@ let(:expected_schema) do
     id: Integer,
     name: String,
     age: Integer,
-    notes: Array[String]
+    notes: [String]
   }
 end
 ```
@@ -231,7 +231,7 @@ end
 ### Interface match
 ```ruby
 let(:expected_schema) do
-    Array[RSpec::JsonApi::Interfaces::PERSON]
+    [RSpec::JsonApi::Interfaces::PERSON]
 end
 ```
 

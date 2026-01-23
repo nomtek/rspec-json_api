@@ -6,7 +6,7 @@ module Rspec
       class TypeGenerator < Rails::Generators::NamedBase
         source_root File.expand_path("templates", __dir__)
 
-        def copy_interface_file
+        def copy_type_file
           create_file "spec/rspec/json_api/types/#{file_name}.rb", <<~FILE
             module RSpec
               module JsonApi
