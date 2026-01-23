@@ -1,0 +1,28 @@
+# Set default line ending behavior for all files
+* text=lf
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.rb text=lf
+*.rake text=lf
+*.gemspec text=lf
+Gemfile text=lf
+Gemfile.lock text=lf
+Rakefile text=lf
+*.md text=lf
+*.yml text=lf
+*.yaml text=lf
+*.json text=lf
+*.txt text=lf
+*.sh text=lf
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
