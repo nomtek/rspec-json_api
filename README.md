@@ -55,8 +55,8 @@ RSpec.describe UsersController, type: :controller do
         id: RSpec::JsonApi::Types::UUID,
         name: String,
         age: Integer,
-        favouriteColorHex: /^\#([a-fA-F]|[0-9]){3,6}$/,
-        number: -> { { type: Integer, min: 10, max: 20, lambda: ->(actual) { actual.even? } } }
+        favoriteColorHex: /^\#([a-fA-F]|[0-9]){3,6}$/,
+        number: -> { { type: Integer, min: 10, max: 20, lambda: lambda(&:even?) } }
       }]
     end
 
@@ -150,7 +150,7 @@ The gem offers variety of possible matching methods.
 
   Failure Example:
     ```ruby
-    let(:expected) do
+    let(:expected_schema) do
       {
         id: RSpec::JsonApi::Types::UUID,
         name: String,
@@ -168,7 +168,7 @@ The gem offers variety of possible matching methods.
   
   Success Example:
   ```ruby
-  let(:expected) do
+  let(:expected_schema) do
     {
       id: RSpec::JsonApi::Types::UUID,
       name: String,
@@ -192,7 +192,7 @@ let(:expected_schema) do
     id: "e0067346-4d24-4aa6-b303-f927a410a001",
     name: "John",
     age: 24,
-    favouriteColorHex: "#FF5733"
+    favoriteColorHex: "#FF5733"
   }
 end
 ```
@@ -236,7 +236,7 @@ end
 ```
 
 ### Proc match
-Proc match allows to customize schema accoring needs using lambda shorthand notation `->`
+Proc match allows to customize schema according needs using lambda shorthand notation `->`
 
 Supported options:
 - #### type
@@ -289,9 +289,9 @@ end
 ```
 - #### lambda
 ```ruby
-let(:expected) do
+let(:expected_schema) do
   {
-    number: -> { { lambda: ->(actual) { actual.even? } } }
+    number: -> { { lambda: lambda(&:even?) } }
   }
 end
 ```

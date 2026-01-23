@@ -21,6 +21,7 @@
 - Fixed module function style (changed `extend self` to `module_function`)
 - Fixed line endings in Gemfile (CRLF to LF)
 - Fixed CI workflow bundler version mismatch
+- Fixed README typos and improved code examples consistency
 
 ## [0.1.0] - 2021-08-24
 
