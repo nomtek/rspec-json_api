@@ -248,7 +248,7 @@ RSpec.describe "match_json_schema matcher" do
             {
               name: "Webster Medina",
               age: 2,
-              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a",
+              id: "8eccff73-f134-42f2-aed4-751d1f4ebd4a"
             },
             {
               id: "8eccff73-f134-42f2-aed4-751d1f4ebd4b",
@@ -432,7 +432,7 @@ RSpec.describe "match_json_schema matcher" do
       let(:expected) do
         {
           id: "111",
-          numbers: Array[Integer]
+          numbers: [Integer]
         }
       end
 
@@ -651,7 +651,7 @@ RSpec.describe "match_json_schema matcher" do
       let(:expected) do
         {
           id: "1",
-          number: -> { { lambda: ->(actual) { actual.even? } } }
+          number: -> { { lambda: lambda(&:even?) } }
         }
       end
 
@@ -762,7 +762,7 @@ RSpec.describe "match_json_schema matcher" do
       context "when single interface given" do
         let(:expected) do
           {
-            interfaces: Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+            interfaces: [RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
           }
         end
 
@@ -874,7 +874,7 @@ RSpec.describe "match_json_schema matcher" do
         id: RSpec::JsonApi::Types::UUID,
         name: "Michal",
         example: RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE,
-        examples: Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE],
+        examples: [RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE],
         not_interfaces_array: [
           {
             hash_array: [
@@ -884,17 +884,17 @@ RSpec.describe "match_json_schema matcher" do
           },
           { id: RSpec::JsonApi::Types::UUID },
           {},
-          Array[]
+          []
         ],
         email: RSpec::JsonApi::Types::EMAIL,
         sex: -> { { inclusion: %w[Male Female] } },
-        height: -> { { type: Integer, lambda: ->(actual) { actual.even? } } },
+        height: -> { { type: Integer, lambda: lambda(&:even?) } },
         age: -> { { type: Integer, min: 1, max: 100, allow_blank: false } },
         preferences: {
           id: "6",
           color: /^bl.*$/,
           address: {
-            city: Array[Integer],
+            city: [Integer],
             zip: {
               sym: "PL",
               code: %w[+48 0048]
@@ -977,7 +977,7 @@ RSpec.describe "match_json_schema matcher" do
         end
 
         let(:expected) do
-          Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+          [RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
         end
 
         include_examples "correct-match"
@@ -1002,7 +1002,7 @@ RSpec.describe "match_json_schema matcher" do
         end
 
         let(:expected) do
-          Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+          [RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
         end
 
         include_examples "correct-match"
@@ -1026,7 +1026,7 @@ RSpec.describe "match_json_schema matcher" do
         end
 
         let(:expected) do
-          Array[RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+          [RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
         end
 
         include_examples "incorrect-match"

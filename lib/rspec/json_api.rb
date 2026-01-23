@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Load 3th party libraries
+# Load 3rd party libraries
 require "json"
 require "diffy"
 require "active_support/core_ext/object/blank"
@@ -10,9 +10,9 @@ require "rspec/json_api/version"
 require "rspec/json_api/compare_hash"
 require "rspec/json_api/compare_array"
 
-# Load extentions
-require "extentions/hash"
-require "extentions/array"
+# Load extensions
+require "extensions/hash"
+require "extensions/array"
 
 # Load matchers
 require "rspec/json_api/matchers"
