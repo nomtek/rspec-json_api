@@ -3,7 +3,7 @@
 module RSpec
   module JsonApi
     module CompareHash
-      extend self
+      module_function
 
       SUPPORTED_OPTIONS = %i[allow_blank type value min max inclusion regex lambda].freeze
 

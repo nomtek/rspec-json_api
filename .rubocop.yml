@@ -1,5 +1,7 @@
 AllCops:
-  TargetRubyVersion: 3.0.1
+  TargetRubyVersion: 3.2
+  NewCops: enable
+  SuggestExtensions: false
 
 Style/StringLiterals:
   Enabled: true
@@ -11,3 +13,36 @@ Style/StringLiteralsInInterpolation:
 
 Layout/LineLength:
   Max: 120
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*_spec.rb"
+
+Metrics/MethodLength:
+  Exclude:
+    - "lib/rspec/json_api/compare_hash.rb"
+    - "lib/extentions/hash.rb"
+
+Metrics/AbcSize:
+  Exclude:
+    - "lib/rspec/json_api/compare_hash.rb"
+    - "lib/rspec/json_api/matchers/match_json_schema.rb"
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - "lib/rspec/json_api/compare_hash.rb"
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - "lib/rspec/json_api/compare_hash.rb"
+
+Style/Documentation:
+  Enabled: false
+
+Naming/PredicatePrefix:
+  Exclude:
+    - "lib/rspec/json_api/matchers.rb"
+
+Naming/PredicateMethod:
+  Exclude:
+    - "lib/rspec/json_api/compare_hash.rb"
