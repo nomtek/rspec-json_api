@@ -15,3 +15,6 @@
 
 # per-appraisal lockfiles (resolved fresh in CI)
 gemfiles/*.gemfile.lock
+
+# local mise tool configuration
+mise.toml
