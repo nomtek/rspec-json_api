@@ -8,6 +8,8 @@ module Rspec
 
         def copy_type_file
           create_file "spec/rspec/json_api/types/#{file_name}.rb", <<~FILE
+            # frozen_string_literal: true
+
             module RSpec
               module JsonApi
                 module Types
