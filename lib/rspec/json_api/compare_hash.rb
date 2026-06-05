@@ -44,7 +44,7 @@ module RSpec
       end
 
       def compare_regexp(actual_value, expected_value)
-        actual_value.to_s =~ expected_value
+        expected_value.match?(actual_value.to_s)
       end
 
       def compare_proc(actual_value, expected_value)
