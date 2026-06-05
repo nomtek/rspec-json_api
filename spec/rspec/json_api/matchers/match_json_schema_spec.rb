@@ -35,6 +35,20 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
+  context "when a matcher instance is reused for a second match" do
+    it "reflects the latest actual value in the failure message" do
+      matcher = match_json_schema({ id: Integer })
+
+      matcher.matches?({ id: "first" }.to_json)
+      matcher.failure_message
+
+      matcher.matches?({ id: "second" }.to_json)
+
+      expect(matcher.failure_message).to include("second")
+      expect(matcher.failure_message).not_to include("first")
+    end
+  end
+
   context "when a nested object is replaced by a scalar" do
     let(:expected) do
       { items: [{ meta: { id: String } }] }

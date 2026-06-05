@@ -23,6 +23,7 @@ module RSpec
         # @param actual [String] The JSON string to test against the expected schema.
         # @return [Boolean] true if the actual JSON matches the expected schema, false otherwise.
         def matches?(actual)
+          @diff = nil
           @actual = JSON.parse(actual, symbolize_names: true)
 
           RSpec::JsonApi::SchemaMatch.match(@actual, expected)
