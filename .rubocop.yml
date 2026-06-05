@@ -1,9 +1,18 @@
+# Append to (rather than replace) RuboCop's default AllCops/Exclude, so the
+# defaults such as vendor/**/* stay excluded. Without this, CI installs gems
+# into vendor/bundle (bundler-cache) and RuboCop would lint third-party gems.
+inherit_mode:
+  merge:
+    - Exclude
+
 AllCops:
   TargetRubyVersion: 3.2
   NewCops: enable
   SuggestExtensions: false
   Exclude:
     - "README.md"
+    - "vendor/**/*"
+    - "gemfiles/vendor/**/*"
 
 Style/StringLiterals:
   Enabled: true
