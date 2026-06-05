@@ -101,10 +101,13 @@ module RSpec
       end
 
       # [{ ...interface... }] => every element must match the single interface.
+      # Elements go through match (not compare) so each one is held to the same
+      # key-structure guard as a top-level object; otherwise an element with an
+      # extra null-valued key would slip through (nil == nil).
       def compare_interface_array(actual_value, expected_value)
         interface = expected_value[0]
 
-        actual_value.all? { |elem| compare(elem, interface) }
+        actual_value.all? { |elem| match(elem, interface) }
       end
 
       # Any other array => element-by-element match, sizes must be equal.

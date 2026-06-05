@@ -1071,6 +1071,18 @@ RSpec.describe "match_json_schema matcher" do
 
         include_examples "incorrect-match"
       end
+
+      context "when an element has an extra null-valued key" do
+        let(:actual) do
+          [{ id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f", extra: nil }].to_json
+        end
+
+        let(:expected) do
+          [{ id: String }]
+        end
+
+        include_examples "incorrect-match"
+      end
     end
   end
 
