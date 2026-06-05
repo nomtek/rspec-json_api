@@ -1,20 +1,45 @@
 name: Ruby
 
-on: [push,pull_request]
+on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    name: "rspec — Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        # Covers the supported range from the floor (Ruby 3.2 / Rails 6.1) to
+        # the current ceiling (Ruby 3.4 / Rails 8.1). Curated pairs avoid
+        # Ruby/Rails combinations that are not mutually supported.
+        include:
+          - { ruby: "3.2", gemfile: rails_6_1 }
+          - { ruby: "3.2", gemfile: rails_7_1 }
+          - { ruby: "3.3", gemfile: rails_7_2 }
+          - { ruby: "3.3", gemfile: rails_8_0 }
+          - { ruby: "3.4", gemfile: rails_8_0 }
+          - { ruby: "3.4", gemfile: rails_8_1 }
+    env:
+      BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 3.2.2
-        bundler: 4.0.4
-    - name: Bundle gems
-      run: bundle install
-    - name: Run rspec
-      run: bundle exec rspec
-    - name: Run rubocop
-      run: bundle exec rubocop
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Run rspec
+        run: bundle exec rspec
+
+  lint:
+    runs-on: ubuntu-latest
+    name: rubocop
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+      - name: Run rubocop
+        run: bundle exec rubocop

@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+# Inherits the dev dependencies from the root Gemfile and pins the Rails line
+# under test. Generated/maintained for the CI compatibility matrix.
+eval_gemfile File.expand_path("../Gemfile", __dir__)
+
+gem "rails", "~> 7.1.0"
