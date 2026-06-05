@@ -27,6 +27,14 @@ RSpec.describe "match_json_schema matcher" do
     include_examples "incorrect-match"
   end
 
+  context "when the schema matches" do
+    it "does not build a diff" do
+      expect(Diffy::Diff).not_to receive(:new)
+
+      expect({ id: "1" }.to_json).to match_json_schema({ id: String })
+    end
+  end
+
   context "when a nested object is replaced by a scalar" do
     let(:expected) do
       { items: [{ meta: { id: String } }] }
