@@ -63,16 +63,11 @@ module RSpec
 
       def compare_values(actual_value, expected_value)
         case expected_value
-        when Class
-          compare_class(actual_value, expected_value)
-        when Regexp
-          compare_regexp(actual_value, expected_value)
-        when Proc
-          compare_proc(actual_value, expected_value)
-        when Array
-          compare_array(actual_value, expected_value)
-        else
-          compare_simple_value(actual_value, expected_value)
+        when Class  then compare_class(actual_value, expected_value)
+        when Regexp then compare_regexp(actual_value, expected_value)
+        when Proc   then compare_proc(actual_value, expected_value)
+        when Array  then compare_array(actual_value, expected_value)
+        else             compare_simple_value(actual_value, expected_value)
         end
       end
 
@@ -90,19 +85,34 @@ module RSpec
 
       def compare_array(actual_value, expected_value)
         if simple_type?(expected_value)
-          type = expected_value[0]
-
-          actual_value.all? { |elem| compare_class(elem, type) }
+          compare_typed_array(actual_value, expected_value)
         elsif interface?(expected_value)
-          interface = expected_value[0]
-
-          actual_value.all? { |elem| compare(elem, interface) }
+          compare_interface_array(actual_value, expected_value)
         else
-          return false if actual_value&.size != expected_value&.size
+          compare_exact_array(actual_value, expected_value)
+        end
+      end
 
-          expected_value.each_with_index.all? do |elem, index|
-            elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_simple_value(actual_value[index], elem)
-          end
+      # [SomeClass] => every element must be an instance of SomeClass.
+      def compare_typed_array(actual_value, expected_value)
+        type = expected_value[0]
+
+        actual_value.all? { |elem| compare_class(elem, type) }
+      end
+
+      # [{ ...interface... }] => every element must match the single interface.
+      def compare_interface_array(actual_value, expected_value)
+        interface = expected_value[0]
+
+        actual_value.all? { |elem| compare(elem, interface) }
+      end
+
+      # Any other array => element-by-element match, sizes must be equal.
+      def compare_exact_array(actual_value, expected_value)
+        return false if actual_value&.size != expected_value&.size
+
+        expected_value.each_with_index.all? do |elem, index|
+          elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_simple_value(actual_value[index], elem)
         end
       end
 

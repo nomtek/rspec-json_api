@@ -20,24 +20,6 @@ Metrics/BlockLength:
   Exclude:
     - "spec/**/*_spec.rb"
 
-Metrics/MethodLength:
-  Exclude:
-    - "lib/rspec/json_api/schema_match.rb"
-    - "lib/extensions/hash.rb"
-
-Metrics/AbcSize:
-  Exclude:
-    - "lib/rspec/json_api/schema_match.rb"
-    - "lib/rspec/json_api/matchers/match_json_schema.rb"
-
-Metrics/CyclomaticComplexity:
-  Exclude:
-    - "lib/rspec/json_api/schema_match.rb"
-
-Metrics/PerceivedComplexity:
-  Exclude:
-    - "lib/rspec/json_api/schema_match.rb"
-
 Style/Documentation:
   Enabled: false
 
