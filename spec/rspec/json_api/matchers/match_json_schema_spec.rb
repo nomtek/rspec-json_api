@@ -15,6 +15,18 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
+  context "when actual is not valid JSON" do
+    let(:expected) do
+      { id: String }
+    end
+
+    let(:actual) do
+      "this is not json"
+    end
+
+    include_examples "incorrect-match"
+  end
+
   context "when schema does not match" do
     let(:expected) do
       {
