@@ -8,12 +8,9 @@ require "active_support/core_ext/object/blank"
 
 # Load the json_api parts
 require "rspec/json_api/version"
+require "rspec/json_api/traversal"
 require "rspec/json_api/constraints"
 require "rspec/json_api/schema_match"
-
-# Load extensions
-require "extensions/hash"
-require "extensions/array"
 
 # Load matchers
 require "rspec/json_api/matchers"

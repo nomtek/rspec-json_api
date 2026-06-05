@@ -19,7 +19,7 @@ module RSpec
         when Array
           compare_array(actual, expected)
         when Hash
-          return false unless actual.deep_keys.deep_sort == expected.deep_keys.deep_sort
+          return false unless same_key_structure?(actual, expected)
 
           compare(actual, expected)
         else
@@ -27,10 +27,15 @@ module RSpec
         end
       end
 
+      def same_key_structure?(actual, expected)
+        Traversal.deep_sort(Traversal.deep_keys(actual)) ==
+          Traversal.deep_sort(Traversal.deep_keys(expected))
+      end
+
       def compare(actual, expected)
         return false if actual.blank? && expected.present?
 
-        keys = expected.deep_key_paths | actual.deep_key_paths
+        keys = Traversal.deep_key_paths(expected) | Traversal.deep_key_paths(actual)
 
         compare_key_paths_and_values(keys, actual, expected)
       end
