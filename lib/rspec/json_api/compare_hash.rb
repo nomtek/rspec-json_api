@@ -17,10 +17,22 @@ module RSpec
 
       def compare_key_paths_and_values(keys, actual, expected)
         keys.all? do |key_path|
-          actual_value = actual.dig(*key_path)
-          expected_value = expected.dig(*key_path)
+          actual_value = dig_path(actual, key_path)
+          expected_value = dig_path(expected, key_path)
 
           compare_values(actual_value, expected_value)
+        end
+      end
+
+      # Digs a key path without raising when an intermediate value is not a Hash.
+      # Plain Hash#dig raises TypeError if it walks into a scalar (e.g. a schema
+      # expects a nested object but the actual value is a String), so a mismatch
+      # would crash instead of failing the match.
+      def dig_path(data, key_path)
+        key_path.reduce(data) do |value, key|
+          break nil unless value.is_a?(Hash)
+
+          value[key]
         end
       end
 

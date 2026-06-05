@@ -27,6 +27,18 @@ RSpec.describe "match_json_schema matcher" do
     include_examples "incorrect-match"
   end
 
+  context "when a nested object is replaced by a scalar" do
+    let(:expected) do
+      { items: [{ meta: { id: String } }] }
+    end
+
+    let(:actual) do
+      { items: [{ meta: "not-an-object" }] }.to_json
+    end
+
+    include_examples "incorrect-match"
+  end
+
   context "when schema does not match" do
     let(:expected) do
       {
