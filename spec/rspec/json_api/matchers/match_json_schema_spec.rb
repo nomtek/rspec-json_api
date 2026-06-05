@@ -362,6 +362,14 @@ RSpec.describe "match_json_schema matcher" do
 
         include_examples "incorrect-match"
       end
+
+      context "when a valid uuid is followed by a newline and extra content" do
+        let(:actual) do
+          { uuid: "07bbf12b-df44-4c8d-9415-aa33f51c5fc2\nmalicious" }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
     end
   end
 
