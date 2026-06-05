@@ -5,8 +5,6 @@ module RSpec
     module CompareHash
       module_function
 
-      SUPPORTED_OPTIONS = %i[allow_blank type value min max inclusion regex lambda].freeze
-
       def compare(actual, expected)
         return false if actual.blank? && expected.present?
 
@@ -60,36 +58,7 @@ module RSpec
       end
 
       def compare_proc(actual_value, expected_value)
-        payload = expected_value.call
-        payload.sanitize!(SUPPORTED_OPTIONS)
-        payload = payload.sort_by { |k, _v| k == :allow_blank ? 0 : 1 }.to_h
-
-        payload.all? do |condition_key, condition_value|
-          case condition_key
-          when :allow_blank
-            return true if actual_value.blank? && condition_value
-
-            true
-          when :type
-            compare_class(actual_value, condition_value)
-          when :value
-            compare_simple_value(actual_value, condition_value)
-          when :inclusion
-            condition_value.include?(actual_value)
-          when :min
-            return false if !condition_value.is_a?(Numeric) || !actual_value.is_a?(Numeric)
-
-            actual_value >= condition_value
-          when :max
-            return false if !condition_value.is_a?(Numeric) || !actual_value.is_a?(Numeric)
-
-            actual_value <= condition_value
-          when :regex
-            compare_regexp(actual_value, condition_value)
-          when :lambda
-            condition_value.call(actual_value)
-          end
-        end
+        Constraints.match(actual_value, expected_value.call)
       end
 
       def compare_array(actual_value, expected_value)
