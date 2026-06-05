@@ -27,10 +27,14 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  # Uncomment to register a new dependency of your gem
+  # Runtime dependencies. The gem only needs ActiveSupport's blank?/present?
+  # core extensions and Rails::Generators (which lives in railties); depending
+  # on the full "rails" meta-gem would force ActiveRecord, ActionCable,
+  # ActionMailer, ActionMailbox, ActiveStorage, ActionText, etc. on every
+  # consumer of a JSON-matcher gem. The >= 6.1.4.1 floor is unchanged.
   spec.add_dependency "activesupport", ">= 6.1.4.1"
   spec.add_dependency "diffy", ">= 3.4.2"
-  spec.add_dependency "rails", ">= 6.1.4.1"
+  spec.add_dependency "railties", ">= 6.1.4.1"
   spec.add_dependency "rspec-rails", ">= 5.0.2"
 
   # For more information and examples about making a new gem, checkout our

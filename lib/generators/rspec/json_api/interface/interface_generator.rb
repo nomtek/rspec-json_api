@@ -8,12 +8,14 @@ module Rspec
 
         def copy_interface_file
           create_file "spec/rspec/json_api/interfaces/#{file_name}.rb", <<~FILE
+            # frozen_string_literal: true
+
             module RSpec
               module JsonApi
                 module Interfaces
                   #{file_name.upcase} = {
                     # name: String
-                  }
+                  }.freeze
                 end
               end
             end

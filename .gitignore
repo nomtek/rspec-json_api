@@ -12,3 +12,6 @@
 
 # built gem files
 *.gem
+
+# per-appraisal lockfiles (resolved fresh in CI)
+gemfiles/*.gemfile.lock

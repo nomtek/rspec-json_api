@@ -15,6 +15,52 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
+  context "when actual is not valid JSON" do
+    let(:expected) do
+      { id: String }
+    end
+
+    let(:actual) do
+      "this is not json"
+    end
+
+    include_examples "incorrect-match"
+  end
+
+  context "when the schema matches" do
+    it "does not build a diff" do
+      expect(Diffy::Diff).not_to receive(:new)
+
+      expect({ id: "1" }.to_json).to match_json_schema({ id: String })
+    end
+  end
+
+  context "when a matcher instance is reused for a second match" do
+    it "reflects the latest actual value in the failure message" do
+      matcher = match_json_schema({ id: Integer })
+
+      matcher.matches?({ id: "first" }.to_json)
+      matcher.failure_message
+
+      matcher.matches?({ id: "second" }.to_json)
+
+      expect(matcher.failure_message).to include("second")
+      expect(matcher.failure_message).not_to include("first")
+    end
+  end
+
+  context "when a nested object is replaced by a scalar" do
+    let(:expected) do
+      { items: [{ meta: { id: String } }] }
+    end
+
+    let(:actual) do
+      { items: [{ meta: "not-an-object" }] }.to_json
+    end
+
+    include_examples "incorrect-match"
+  end
+
   context "when schema does not match" do
     let(:expected) do
       {
@@ -358,6 +404,14 @@ RSpec.describe "match_json_schema matcher" do
       context "when incorrect match" do
         let(:actual) do
           { uuid: "07bbf12b-df44-4c8d-9415-aa33f51c5f" }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+
+      context "when a valid uuid is followed by a newline and extra content" do
+        let(:actual) do
+          { uuid: "07bbf12b-df44-4c8d-9415-aa33f51c5fc2\nmalicious" }.to_json
         end
 
         include_examples "incorrect-match"
@@ -1027,6 +1081,18 @@ RSpec.describe "match_json_schema matcher" do
 
         let(:expected) do
           [RSpec::JsonApi::Interfaces::EXAMPLE_INTERFACE]
+        end
+
+        include_examples "incorrect-match"
+      end
+
+      context "when an element has an extra null-valued key" do
+        let(:actual) do
+          [{ id: "8eccff73-f134-42f2-aed4-751d1f4ebd4f", extra: nil }].to_json
+        end
+
+        let(:expected) do
+          [{ id: String }]
         end
 
         include_examples "incorrect-match"

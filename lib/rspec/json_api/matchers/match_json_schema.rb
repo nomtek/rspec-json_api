@@ -23,18 +23,13 @@ module RSpec
         # @param actual [String] The JSON string to test against the expected schema.
         # @return [Boolean] true if the actual JSON matches the expected schema, false otherwise.
         def matches?(actual)
+          @diff = nil
           @actual = JSON.parse(actual, symbolize_names: true)
-          @diff = Diffy::Diff.new(expected, @actual, context: 5)
 
-          return false unless @actual.instance_of?(expected.class)
-
-          if expected.instance_of?(Array)
-            RSpec::JsonApi::CompareArray.compare(@actual, expected)
-          else
-            return false unless @actual.deep_keys.deep_sort == expected.deep_keys.deep_sort
-
-            RSpec::JsonApi::CompareHash.compare(@actual, expected)
-          end
+          RSpec::JsonApi::SchemaMatch.match(@actual, expected)
+        rescue JSON::ParserError
+          @actual = actual
+          false
         end
 
         # Provides a failure message for when the JSON data does not match the expected schema.
@@ -45,7 +40,7 @@ module RSpec
                  got: #{actual}
 
             Diff:
-            #{@diff}
+            #{diff}
           MSG
         end
 
@@ -54,6 +49,14 @@ module RSpec
         # @return [self] Returns itself, but typically this method should be implemented to return a descriptive message
         def failure_message_when_negated
           "expected the JSON data not to match the provided schema, but it did."
+        end
+
+        private
+
+        # The diff is only needed to render a failure message, so it is built
+        # lazily and memoized rather than on every matches? call.
+        def diff
+          @diff ||= Diffy::Diff.new(expected, actual, context: 5)
         end
       end
     end
