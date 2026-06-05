@@ -2,6 +2,7 @@
 
 # Load 3rd party libraries
 require "json"
+require "uri"
 require "diffy"
 require "active_support/core_ext/object/blank"
 
