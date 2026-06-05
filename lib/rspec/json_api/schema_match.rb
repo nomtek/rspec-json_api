@@ -2,8 +2,30 @@
 
 module RSpec
   module JsonApi
-    module CompareHash
+    # SchemaMatch compares parsed JSON (a Hash, an Array, or a scalar) against an
+    # expected schema. It is the single entry point behind the match_json_schema
+    # matcher: callers hand it the actual and expected values and it dispatches on
+    # shape internally, so the matcher does not need to know whether it is looking
+    # at an object or a collection.
+    module SchemaMatch
       module_function
+
+      # Top-level comparison. Applies the shape guards (class equality and, for
+      # objects, key-set equality) before recursing.
+      def match(actual, expected)
+        return false unless actual.instance_of?(expected.class)
+
+        case expected
+        when Array
+          compare_array(actual, expected)
+        when Hash
+          return false unless actual.deep_keys.deep_sort == expected.deep_keys.deep_sort
+
+          compare(actual, expected)
+        else
+          compare_simple_value(actual, expected)
+        end
+      end
 
       def compare(actual, expected)
         return false if actual.blank? && expected.present?
