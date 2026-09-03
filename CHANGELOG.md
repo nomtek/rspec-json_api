@@ -1,9 +1,26 @@
 ## [Unreleased]
 
+## [1.5.1] - 2026-09-03
+
+### Fixed
+- A list schema (`[String]`, `[INTERFACE]`) fails the match instead of raising `NoMethodError` when the response holds `null` or a scalar where an array was expected. This affected nested lists too, so an interface element with a scalar in place of a list crashed the example.
+- `Types::URI` is anchored with `\A...\z`. It previously accepted any value that merely contained a URI, so `"see https://example.com for details"` matched. `EMAIL` and `UUID` were already anchored. Suites that relied on the substring behaviour will start failing.
+- `match_json_schema` fails with `expected a JSON String to match against the schema, got NilClass` instead of raising `TypeError` when handed `nil`, an already-parsed Hash, or any other non-String.
+- A schema `Proc` that returns something other than an options Hash, or that expects the value as an argument, raises a descriptive `ArgumentError` naming the mistake. Both previously surfaced as a bare `NoMethodError` or `wrong number of arguments` from inside the matcher.
+- The `have_no_content` specs gave every body its own context. A repeated `let(:actual)` in one context meant the `"{}"` case never ran.
+
+### Changed
+- The released gem contains `lib/`, the licence, the README and the CHANGELOG, and nothing else. It previously packaged the repository's own tooling: the CI workflow, the RuboCop config, the Gemfile and lockfile, the Rakefile, `bin/` and `gemfiles/`.
+- Updated the locked development dependencies past every advisory `bundler-audit` reported: rack, nokogiri, railties, activesupport, concurrent-ruby, loofah, crass, erb, json, rails-html-sanitizer and rack-session.
+
+### Added
+- A `bundler-audit` job in CI, a Dependabot config for bundler and github-actions, and `permissions: contents: read` on the workflow.
+- `ROADMAP.md`, the prioritised findings from a full review of the codebase.
+
 ## [1.5.0] - 2026-06-05
 
 ### Added
-- CI compatibility matrix across Ruby 3.2–3.4 and Rails 6.1, 7.1, 7.2, 8.0 and 8.1 (`gemfiles/` + GitHub Actions matrix), so the advertised version support is actually tested.
+- CI compatibility matrix across Ruby 3.2-3.4 and Rails 6.1, 7.1, 7.2, 8.0 and 8.1 (`gemfiles/` + GitHub Actions matrix), so the advertised version support is actually tested.
 - `RSpec::JsonApi::Constraints` module encapsulating the schema `Proc` options DSL.
 - `RSpec::JsonApi::SchemaMatch` as the single comparison entry point, and `RSpec::JsonApi::Traversal` for the internal structural helpers.
 
