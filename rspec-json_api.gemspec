@@ -18,13 +18,16 @@ Gem::Specification.new do |spec|
   spec.metadata["changelog_uri"] = "https://github.com/nomtek/rspec-json_api/blob/master/CHANGELOG.md"
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  # Specify which files should be added to the gem when it is released.
-  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
+  # Ship what a consumer loads and nothing else: the library, the generators
+  # (templates included, so the dotfile markers that keep the empty interface
+  # and type directories must be globbed too), plus the licence and reference
+  # documents. Listing every tracked file, as `git ls-files` did, packaged the
+  # repository's own tooling inside the released gem: the CI workflow, the
+  # RuboCop config, the Gemfile and lockfile, the Rakefile, bin/ and gemfiles/.
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{\A(?:test|spec|features)/}) }
+    Dir.glob("lib/**/*", File::FNM_DOTMATCH).select { |f| File.file?(f) }.sort +
+      %w[CHANGELOG.md LICENSE.txt README.md]
   end
-  spec.bindir        = "exe"
-  spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
   # Runtime dependencies. The gem only needs ActiveSupport's blank?/present?
