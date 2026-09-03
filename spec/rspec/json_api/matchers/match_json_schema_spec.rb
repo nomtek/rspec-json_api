@@ -27,6 +27,29 @@ RSpec.describe "match_json_schema matcher" do
     include_examples "incorrect-match"
   end
 
+  context "when actual is not a JSON String" do
+    it "fails instead of raising for nil" do
+      matcher = match_json_schema({ id: String })
+
+      expect { matcher.matches?(nil) }.not_to raise_error
+      expect(matcher.matches?(nil)).to be(false)
+    end
+
+    it "fails instead of raising for an already-parsed Hash" do
+      matcher = match_json_schema({ id: String })
+
+      expect { matcher.matches?({ id: "x" }) }.not_to raise_error
+      expect(matcher.matches?({ id: "x" })).to be(false)
+    end
+
+    it "names the offending type in the failure message" do
+      matcher = match_json_schema({ id: String })
+      matcher.matches?(nil)
+
+      expect(matcher.failure_message).to include("JSON String", "NilClass")
+    end
+  end
+
   context "when the schema matches" do
     it "does not build a diff" do
       expect(Diffy::Diff).not_to receive(:new)
