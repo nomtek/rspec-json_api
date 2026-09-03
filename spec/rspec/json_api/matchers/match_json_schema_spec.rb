@@ -50,6 +50,18 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
+  context "when a schema Proc is misused" do
+    it "raises ArgumentError when the Proc does not return an options Hash" do
+      expect { match_json_schema({ a: -> { true } }).matches?({ a: 1 }.to_json) }
+        .to raise_error(ArgumentError, /must return an options Hash/)
+    end
+
+    it "raises ArgumentError when the Proc expects an argument" do
+      expect { match_json_schema({ a: ->(value) { value > 1 } }).matches?({ a: 2 }.to_json) }
+        .to raise_error(ArgumentError, /must take no arguments/)
+    end
+  end
+
   context "when the schema matches" do
     it "does not build a diff" do
       expect(Diffy::Diff).not_to receive(:new)

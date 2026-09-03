@@ -79,8 +79,22 @@ module RSpec
         expected_value.match?(actual_value.to_s)
       end
 
+      # A schema Proc describes the constraints for a value; it is called without
+      # arguments and must return the option Hash. A Proc that expects the value
+      # as an argument is a common misreading of the DSL, and calling it here
+      # would raise a bare "wrong number of arguments" from deep in the matcher.
       def compare_proc(actual_value, expected_value)
+        unless zero_arity?(expected_value)
+          raise ArgumentError,
+                "schema Proc must take no arguments; " \
+                "write -> { { lambda: ->(value) { ... } } } to test the value itself"
+        end
+
         Constraints.match(actual_value, expected_value.call)
+      end
+
+      def zero_arity?(callable)
+        callable.parameters.none? { |type, _name| %i[req keyreq].include?(type) }
       end
 
       # A list schema only ever matches an actual Array. Without this guard the
