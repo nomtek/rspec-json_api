@@ -84,7 +84,7 @@ module RSpec
       # as an argument is a common misreading of the DSL, and calling it here
       # would raise a bare "wrong number of arguments" from deep in the matcher.
       def compare_proc(actual_value, expected_value)
-        unless zero_arity?(expected_value)
+        unless callable_without_arguments?(expected_value)
           raise ArgumentError,
                 "schema Proc must take no arguments; " \
                 "write -> { { lambda: ->(value) { ... } } } to test the value itself"
@@ -93,7 +93,10 @@ module RSpec
         Constraints.match(actual_value, expected_value.call)
       end
 
-      def zero_arity?(callable)
+      # True when the Proc can be called with no arguments at all. Splat and
+      # optional-argument forms qualify; a required positional or keyword
+      # argument does not.
+      def callable_without_arguments?(callable)
         callable.parameters.none? { |type, _name| %i[req keyreq].include?(type) }
       end
 
