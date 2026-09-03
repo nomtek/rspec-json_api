@@ -1,20 +1,25 @@
 # frozen_string_literal: true
 
-RSpec.describe "match_empty_body matcher" do
-  context "when empty value is given" do
+RSpec.describe "have_no_content matcher" do
+  context "when an empty string is given" do
     let(:actual) { "" }
 
-    it "matches expected schema" do
+    it "matches" do
       expect(actual).to have_no_content
     end
   end
 
-  context "when non-empty value is given" do
-    %w[{} []].each do |actual_value|
-      let(:actual) { actual_value }
+  context "when a non-empty string is given" do
+    # Each value needs its own context: declaring let(:actual) more than once in
+    # a single context makes the last declaration win, so the earlier values
+    # would never be exercised.
+    ["{}", "[]", '{"id":1}', " "].each do |actual_value|
+      context "when the body is #{actual_value.inspect}" do
+        let(:actual) { actual_value }
 
-      it "matches expected schema" do
-        expect(actual).not_to have_no_content
+        it "does not match" do
+          expect(actual).not_to have_no_content
+        end
       end
     end
   end

@@ -33,6 +33,7 @@ module RSpec
       end
 
       def compare(actual, expected)
+        return false unless actual.is_a?(Hash)
         return false if actual.blank? && expected.present?
 
         keys = Traversal.deep_key_paths(expected) | Traversal.deep_key_paths(actual)
@@ -79,11 +80,37 @@ module RSpec
         expected_value.match?(actual_value.to_s)
       end
 
+      # A schema Proc describes the constraints for a value; it is called without
+      # arguments and must return the option Hash. A Proc that expects the value
+      # as an argument is a common misreading of the DSL, and calling it here
+      # would raise a bare "wrong number of arguments" from deep in the matcher.
       def compare_proc(actual_value, expected_value)
-        Constraints.match(actual_value, expected_value.call)
+        if declares_value_parameter?(expected_value)
+          raise ArgumentError,
+                "schema Proc must take no arguments; " \
+                "write -> { { lambda: ->(value) { ... } } } to test the value itself"
+        end
+
+        options = expected_value.call
+        raise ArgumentError, "schema Proc must return an options Hash, got #{options.class}" unless options.is_a?(Hash)
+
+        Constraints.match(actual_value, options)
       end
 
+      # A non-lambda Proc reports its block parameters as optional, so
+      # `proc { |value| ... }` has to be caught on the parameter list rather
+      # than on arity. A bare splat states no expectation and is left alone.
+      def declares_value_parameter?(callable)
+        callable.parameters.any? { |type, _name| %i[req opt keyreq].include?(type) }
+      end
+
+      # A list schema only ever matches an actual Array. Without this guard the
+      # branches below call Array methods on whatever the response contained, so
+      # a null or a scalar where a list was expected raised NoMethodError
+      # instead of failing the match.
       def compare_array(actual_value, expected_value)
+        return false unless actual_value.is_a?(Array)
+
         if simple_type?(expected_value)
           compare_typed_array(actual_value, expected_value)
         elsif interface?(expected_value)
@@ -112,10 +139,10 @@ module RSpec
 
       # Any other array => element-by-element match, sizes must be equal.
       def compare_exact_array(actual_value, expected_value)
-        return false if actual_value&.size != expected_value&.size
+        return false if actual_value.size != expected_value.size
 
         expected_value.each_with_index.all? do |elem, index|
-          elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_simple_value(actual_value[index], elem)
+          elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_values(actual_value[index], elem)
         end
       end
 

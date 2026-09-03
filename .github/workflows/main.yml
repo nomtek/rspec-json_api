@@ -2,10 +2,13 @@ name: Ruby
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: "rspec — Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }}"
+    name: "rspec - Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }}"
     strategy:
       fail-fast: false
       matrix:
@@ -22,7 +25,7 @@ jobs:
     env:
       BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -35,11 +38,27 @@ jobs:
     runs-on: ubuntu-latest
     name: rubocop
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.2"
+          # The root lockfile pins dev tooling that needs Ruby >= 3.3; the
+          # gem's own 3.2 floor is covered by the test matrix.
+          ruby-version: "3.4"
           bundler-cache: true
       - name: Run rubocop
         run: bundle exec rubocop
+
+  audit:
+    runs-on: ubuntu-latest
+    name: bundler-audit
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          # As in the lint job: the root lockfile needs Ruby >= 3.3.
+          ruby-version: "3.4"
+          bundler-cache: true
+      - name: Check the lockfile against the advisory database
+        run: bundle exec bundle-audit check --update

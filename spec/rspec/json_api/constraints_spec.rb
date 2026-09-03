@@ -7,6 +7,11 @@ RSpec.describe RSpec::JsonApi::Constraints do
         .to raise_error(ArgumentError, /Unsupported match option/)
     end
 
+    it "raises ArgumentError when the options are not a Hash" do
+      expect { described_class.match("value", true) }
+        .to raise_error(ArgumentError, /options must be a Hash/)
+    end
+
     it "accepts a blank value when allow_blank is true" do
       expect(described_class.match(nil, value: "John", allow_blank: true)).to be(true)
     end

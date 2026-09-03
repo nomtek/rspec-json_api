@@ -27,6 +27,51 @@ RSpec.describe "match_json_schema matcher" do
     include_examples "incorrect-match"
   end
 
+  context "when actual is not a JSON String" do
+    it "fails instead of raising for nil" do
+      matcher = match_json_schema({ id: String })
+
+      expect(matcher.matches?(nil)).to be(false)
+    end
+
+    it "fails instead of raising for an already-parsed Hash" do
+      matcher = match_json_schema({ id: String })
+
+      expect(matcher.matches?({ id: "x" })).to be(false)
+    end
+
+    it "names the offending type in the failure message" do
+      matcher = match_json_schema({ id: String })
+      matcher.matches?(nil)
+
+      expect(matcher.failure_message).to include("JSON String", "NilClass")
+    end
+
+    it "fails the negated form too, rather than passing by default" do
+      matcher = match_json_schema({ id: String })
+
+      expect(matcher.does_not_match?(nil)).to be(false)
+      expect(matcher.failure_message_when_negated).to include("JSON String", "NilClass")
+    end
+  end
+
+  context "when a schema Proc is misused" do
+    it "raises ArgumentError when the Proc does not return an options Hash" do
+      expect { match_json_schema({ a: -> { true } }).matches?({ a: 1 }.to_json) }
+        .to raise_error(ArgumentError, /must return an options Hash/)
+    end
+
+    it "raises ArgumentError when the Proc expects an argument" do
+      expect { match_json_schema({ a: ->(value) { value > 1 } }).matches?({ a: 2 }.to_json) }
+        .to raise_error(ArgumentError, /must take no arguments/)
+    end
+
+    it "raises ArgumentError when a non-lambda Proc expects an argument" do
+      expect { match_json_schema({ a: proc { |value| value > 1 } }).matches?({ a: 2 }.to_json) }
+        .to raise_error(ArgumentError, /must take no arguments/)
+    end
+  end
+
   context "when the schema matches" do
     it "does not build a diff" do
       expect(Diffy::Diff).not_to receive(:new)
@@ -386,6 +431,22 @@ RSpec.describe "match_json_schema matcher" do
 
         include_examples "incorrect-match"
       end
+
+      context "when a valid uri is embedded in surrounding text" do
+        let(:actual) do
+          { uri: "see https://example.com for details" }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+
+      context "when a valid uri is surrounded by whitespace" do
+        let(:actual) do
+          { uri: "  https://example.com  " }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
     end
 
     describe "uuid" do
@@ -511,6 +572,112 @@ RSpec.describe "match_json_schema matcher" do
 
         include_examples "incorrect-match"
       end
+    end
+  end
+
+  context "when a list schema meets a non-array value" do
+    context "when a typed-array schema meets a scalar" do
+      let(:expected) do
+        { notes: [String] }
+      end
+
+      let(:actual) do
+        { notes: "x" }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when a typed-array schema meets null" do
+      let(:expected) do
+        { notes: [String] }
+      end
+
+      let(:actual) do
+        { notes: nil }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when an interface-array schema meets null" do
+      let(:expected) do
+        { items: [{ id: Integer }] }
+      end
+
+      let(:actual) do
+        { items: nil }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when a nested typed-array schema meets a scalar" do
+      let(:expected) do
+        { items: [{ tags: [String] }] }
+      end
+
+      let(:actual) do
+        { items: [{ tags: "b" }] }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when an exact-array schema meets a string of the same length" do
+      let(:expected) do
+        { tags: [1, 2] }
+      end
+
+      let(:actual) do
+        { tags: "ab" }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+  end
+
+  context "when an exact-array schema of objects meets elements of another shape" do
+    let(:expected) do
+      { tags: [{ id: Integer }, { id: Integer }] }
+    end
+
+    context "when the elements are scalars" do
+      let(:actual) do
+        { tags: %w[a b] }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when the elements are null" do
+      let(:actual) do
+        { tags: [nil, nil] }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+  end
+
+  context "when an exact-array schema holds a type" do
+    let(:expected) do
+      { uris: [RSpec::JsonApi::Types::URI] }
+    end
+
+    context "when correct match" do
+      let(:actual) do
+        { uris: ["https://example.com/a"] }.to_json
+      end
+
+      include_examples "correct-match"
+    end
+
+    context "when incorrect match" do
+      let(:actual) do
+        { uris: ["not a uri"] }.to_json
+      end
+
+      include_examples "incorrect-match"
     end
   end
 
