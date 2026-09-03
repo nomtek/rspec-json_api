@@ -514,6 +514,68 @@ RSpec.describe "match_json_schema matcher" do
     end
   end
 
+  context "when a list schema meets a non-array value" do
+    context "when a typed-array schema meets a scalar" do
+      let(:expected) do
+        { notes: [String] }
+      end
+
+      let(:actual) do
+        { notes: "x" }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when a typed-array schema meets null" do
+      let(:expected) do
+        { notes: [String] }
+      end
+
+      let(:actual) do
+        { notes: nil }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when an interface-array schema meets null" do
+      let(:expected) do
+        { items: [{ id: Integer }] }
+      end
+
+      let(:actual) do
+        { items: nil }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when a nested typed-array schema meets a scalar" do
+      let(:expected) do
+        { items: [{ tags: [String] }] }
+      end
+
+      let(:actual) do
+        { items: [{ tags: "b" }] }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when an exact-array schema meets a string of the same length" do
+      let(:expected) do
+        { tags: [1, 2] }
+      end
+
+      let(:actual) do
+        { tags: "ab" }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+  end
+
   context "when proc given" do
     context "when type comparison" do
       let(:expected) do

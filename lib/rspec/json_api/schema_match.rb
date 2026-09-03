@@ -83,7 +83,13 @@ module RSpec
         Constraints.match(actual_value, expected_value.call)
       end
 
+      # A list schema only ever matches an actual Array. Without this guard the
+      # branches below call Array methods on whatever the response contained, so
+      # a null or a scalar where a list was expected raised NoMethodError
+      # instead of failing the match.
       def compare_array(actual_value, expected_value)
+        return false unless actual_value.is_a?(Array)
+
         if simple_type?(expected_value)
           compare_typed_array(actual_value, expected_value)
         elsif interface?(expected_value)
@@ -112,7 +118,7 @@ module RSpec
 
       # Any other array => element-by-element match, sizes must be equal.
       def compare_exact_array(actual_value, expected_value)
-        return false if actual_value&.size != expected_value&.size
+        return false if actual_value.size != expected_value.size
 
         expected_value.each_with_index.all? do |elem, index|
           elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_simple_value(actual_value[index], elem)
