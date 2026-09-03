@@ -450,11 +450,11 @@ Priority: High. Category: Test debt. Effort: M. Status: Confirmed.
 
 Priority: Medium. Category: CI. Effort: M. Status: Confirmed.
 
-**Evidence.** `.github/workflows/main.yml:15-21` runs six Ruby/Rails pairs, but `spec/spec_helper.rb` requires only `rspec/json_api`, which in turn requires a single ActiveSupport file (`json_api.rb:7`). Nothing requires `rails` or `rspec-rails`, and the generators are never invoked. Each Rails job therefore tests `Object#blank?` against that Rails version. The 1.5.0 CHANGELOG describes the matrix as making "the advertised version support actually tested".
+**Evidence.** `.github/workflows/main.yml:47-52` runs six Ruby/Rails pairs, but `spec/spec_helper.rb` requires only `rspec/json_api`, which in turn requires a single ActiveSupport file (`json_api.rb:7`). Nothing requires `rails` or `rspec-rails`, and the generators are never invoked. Each Rails job therefore tests `Object#blank?` against that Rails version. The 1.5.0 CHANGELOG describes the matrix as making "the advertised version support actually tested".
 
 **Problem and impact.** Six jobs of CI time for one line of coverage, and a false sense that Rails 6.1 through 8.1 compatibility is verified. Ruby 4.0 is also absent even though 1.5.0 shipped a Ruby 4.0 load fix (commit `8f7318a`), and the local lockfile was resolved on Ruby 4.0.
 
-**Recommended solution.** After 2.1, the runtime matrix only needs Ruby versions (3.2, 3.3, 3.4, 4.0) with the plain Gemfile. Keep one or two Rails appraisals that actually load `rspec-rails` and run the generator specs from 5.1 against a minimal dummy app. Add `permissions: contents: read` and a `concurrency` group while touching the file.
+**Recommended solution.** After 2.1, the runtime matrix only needs Ruby versions (3.2, 3.3, 3.4, 4.0) with the plain Gemfile. Keep one or two Rails appraisals that actually load `rspec-rails` and run the generator specs from 5.1 against a minimal dummy app. The `permissions: contents: read` and `concurrency` parts of this item are done; only the matrix rework is outstanding.
 
 ### 5.3 Supply-chain checks are not automated (done in 1.6.0)
 

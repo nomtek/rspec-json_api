@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+### Changed
+- CI pins `actions/checkout` by commit SHA (v7.0.1) instead of the mutable `v7` tag, so a repointed upstream tag cannot change what runs without a diff here. `ruby/setup-ruby` deliberately stays on `v1`, the reference upstream documents, because a pinned release only knows the Ruby builds it shipped with. Checkout also runs with `persist-credentials: false`: no step needs git credentials, and bundler evaluates gemspec and native-extension code from the branch under test.
+- The workflow runs once per change rather than twice. `push` is scoped to `master`, so a branch with an open pull request no longer builds under both events, and a `concurrency` group cancels superseded pull request runs. Runs on `master` are left alone, so every commit there keeps a result.
+- `rubocop` and `bundler-audit` share one job definition instead of two byte-identical ones, and every job carries `timeout-minutes: 30` in place of the six-hour default.
+
+### Added
+- A weekly `schedule` trigger, so `bundler-audit` reports an advisory published against a lockfile nobody has touched. Only the audit runs on that trigger. `workflow_dispatch` runs it on demand and is also how the cron is re-armed, since GitHub disables scheduled workflows after 60 days without repository activity.
+
 ## [1.6.0] - 2026-09-03
 
 ### Fixed
