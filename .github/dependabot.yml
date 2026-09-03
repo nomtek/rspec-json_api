@@ -1,0 +1,15 @@
+version: 2
+
+updates:
+  # The lockfile is a development artifact (consumers resolve their own), but
+  # keeping it current is what stops the advisory backlog rebuilding quietly.
+  - package-ecosystem: bundler
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
