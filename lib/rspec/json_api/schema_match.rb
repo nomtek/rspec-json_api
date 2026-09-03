@@ -33,6 +33,7 @@ module RSpec
       end
 
       def compare(actual, expected)
+        return false unless actual.is_a?(Hash)
         return false if actual.blank? && expected.present?
 
         keys = Traversal.deep_key_paths(expected) | Traversal.deep_key_paths(actual)
@@ -84,20 +85,23 @@ module RSpec
       # as an argument is a common misreading of the DSL, and calling it here
       # would raise a bare "wrong number of arguments" from deep in the matcher.
       def compare_proc(actual_value, expected_value)
-        unless callable_without_arguments?(expected_value)
+        if declares_value_parameter?(expected_value)
           raise ArgumentError,
                 "schema Proc must take no arguments; " \
                 "write -> { { lambda: ->(value) { ... } } } to test the value itself"
         end
 
-        Constraints.match(actual_value, expected_value.call)
+        options = expected_value.call
+        raise ArgumentError, "schema Proc must return an options Hash, got #{options.class}" unless options.is_a?(Hash)
+
+        Constraints.match(actual_value, options)
       end
 
-      # True when the Proc can be called with no arguments at all. Splat and
-      # optional-argument forms qualify; a required positional or keyword
-      # argument does not.
-      def callable_without_arguments?(callable)
-        callable.parameters.none? { |type, _name| %i[req keyreq].include?(type) }
+      # A non-lambda Proc reports its block parameters as optional, so
+      # `proc { |value| ... }` has to be caught on the parameter list rather
+      # than on arity. A bare splat states no expectation and is left alone.
+      def declares_value_parameter?(callable)
+        callable.parameters.any? { |type, _name| %i[req opt keyreq].include?(type) }
       end
 
       # A list schema only ever matches an actual Array. Without this guard the
@@ -138,7 +142,7 @@ module RSpec
         return false if actual_value.size != expected_value.size
 
         expected_value.each_with_index.all? do |elem, index|
-          elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_simple_value(actual_value[index], elem)
+          elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_values(actual_value[index], elem)
         end
       end
 

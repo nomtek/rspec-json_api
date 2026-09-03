@@ -2,8 +2,10 @@
 
 RSpec.describe "rspec-json_api.gemspec" do
   subject(:gemspec) do
-    Gem::Specification.load(File.expand_path("../../../rspec-json_api.gemspec", __dir__))
+    Gem::Specification.load(File.join(repo_root, "rspec-json_api.gemspec"))
   end
+
+  let(:repo_root) { File.expand_path("../../..", __dir__) }
 
   it "packages the library" do
     expect(gemspec.files).to include("lib/rspec/json_api.rb", "lib/rspec/json_api/version.rb")
@@ -21,14 +23,13 @@ RSpec.describe "rspec-json_api.gemspec" do
     expect(gemspec.files).to include("LICENSE.txt", "README.md", "CHANGELOG.md")
   end
 
-  it "does not package repository tooling" do
-    expect(gemspec.files).not_to include(
-      ".github/workflows/main.yml", ".rubocop.yml", ".gitignore", "Gemfile", "Gemfile.lock", "Rakefile"
-    )
+  it "packages every tracked file under lib and nothing else from there" do
+    tracked_lib = Dir.chdir(repo_root) { `git ls-files -z lib`.split("\x0").sort }
+
+    expect(gemspec.files.grep(%r{\Alib/})).to eq(tracked_lib)
   end
 
-  it "does not package the spec suite, the appraisals or the roadmap" do
-    expect(gemspec.files.grep(%r{\A(spec|gemfiles|bin)/})).to be_empty
-    expect(gemspec.files).not_to include("ROADMAP.md")
+  it "packages nothing outside lib but the licence and the reference documents" do
+    expect(gemspec.files.grep_v(%r{\Alib/})).to contain_exactly("CHANGELOG.md", "LICENSE.txt", "README.md")
   end
 end

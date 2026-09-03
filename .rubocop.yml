@@ -32,9 +32,12 @@ Metrics/BlockLength:
 Style/Documentation:
   Enabled: false
 
+# RSpec fixes both names: `have_no_content` is the matcher DSL entry point and
+# `does_not_match?` is part of the matcher protocol.
 Naming/PredicatePrefix:
   Exclude:
     - "lib/rspec/json_api/matchers.rb"
+    - "lib/rspec/json_api/matchers/match_json_schema.rb"
 
 Naming/PredicateMethod:
   Exclude:

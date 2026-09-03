@@ -28,11 +28,13 @@ Each item is marked either **Confirmed** (reproduced or directly visible in the 
 
 ## Progress
 
-Phase 1 is implemented on branch `fix/roadmap-phase-1` and versioned as 1.5.1. Done: 1.1, 1.3, 1.4, 1.6, 1.7, 2.3, 2.4, 5.3, 5.5. Every code fix was written test-first, and the item headings below carry a "Done in 1.5.1" marker. Nothing has been published to RubyGems.
+Phase 1 is implemented on branch `fix/roadmap-phase-1`, released as 1.6.0 rather than 1.5.1 because code review pulled item 3.2 forward and that adds a capability. Done: 1.1, 1.3, 1.4, 1.6, 1.7, 2.3, 2.4, 3.2, 5.3, 5.5, each marked on its heading below. Nothing has been published to RubyGems.
+
+Review of that work also turned up two crashes the original audit missed, both now fixed and specced. `SchemaMatch.compare` raised `NoMethodError` when an object schema met array elements of another shape, which is item 1.1's bug on the object path rather than the array path. And the guard added for item 1.6 read a Proc's arity, which does not catch `proc { |value| ... }`, because Ruby reports a non-lambda block parameter as optional; the check now reads the parameter list.
 
 ## 1. Bugs to fix
 
-### 1.1 List schemas crash when the actual value is not an array (done in 1.5.1)
+### 1.1 List schemas crash when the actual value is not an array (done in 1.6.0)
 
 Priority: Critical. Category: Correctness. Effort: S. Status: Confirmed.
 
@@ -76,7 +78,7 @@ match_json_schema({ n: -> { { type: String, allow_blank: true } } }).matches?('{
 
 **Dependencies and risks.** Behaviour change: suites that relied on the lax check will start failing, correctly. Note it under "Fixed" in the CHANGELOG. Pairs naturally with 3.2, which touches the same method.
 
-### 1.3 `Types::URI` is unanchored (done in 1.5.1)
+### 1.3 `Types::URI` is unanchored (done in 1.6.0)
 
 Priority: High. Category: Correctness. Effort: S. Status: Confirmed.
 
@@ -95,7 +97,7 @@ match_json_schema({ u: RSpec::JsonApi::Types::URI })
 
 **Dependencies and risks.** Strings with surrounding whitespace start failing; that is the intended behaviour.
 
-### 1.4 Matcher raises `TypeError` for `nil` or already-parsed input (done in 1.5.1)
+### 1.4 Matcher raises `TypeError` for `nil` or already-parsed input (done in 1.6.0)
 
 Priority: High. Category: Robustness. Effort: S. Status: Confirmed.
 
@@ -129,7 +131,7 @@ match_json_schema({ code: /.*/ }).matches?('{"code":null}')      # => true (nil.
 
 **Dependencies and risks.** Breaking for suites that regex-match numbers. Ship with 2.1 in a version that already carries a CHANGELOG "Changed" section; consider 2.0.0 for the combined set (see phasing).
 
-### 1.6 Misused Proc schemas raise raw Ruby errors (done in 1.5.1)
+### 1.6 Misused Proc schemas raise raw Ruby errors (done in 1.6.0)
 
 Priority: Medium. Category: Robustness. Effort: S. Status: Confirmed.
 
@@ -146,7 +148,7 @@ match_json_schema({ a: ->(v) { v > 1 } }).matches?('{"a":2}')    # ArgumentError
 
 **Dependencies and risks.** If arity-1 lambdas become predicates, document it and add specs; it overlaps with 4.2.
 
-### 1.7 `have_no_content_spec.rb` never tests the `"{}"` case (done in 1.5.1)
+### 1.7 `have_no_content_spec.rb` never tests the `"{}"` case (done in 1.6.0)
 
 Priority: Low. Category: Test correctness. Effort: S. Status: Confirmed.
 
@@ -200,7 +202,7 @@ Priority: Medium. Category: Dependencies. Effort: S. Status: Confirmed (usage), 
 
 **Dependencies and risks.** Requires 2.1 to be worthwhile. `blank?` on unusual objects (e.g. `BigDecimal`) is not relevant because input always comes from `JSON.parse`.
 
-### 2.3 Move the development lockfile past open security advisories (done in 1.5.1)
+### 2.3 Move the development lockfile past open security advisories (done in 1.6.0)
 
 Priority: High. Category: Security / dependencies. Effort: S. Status: Confirmed.
 
@@ -228,7 +230,7 @@ Priority: High. Category: Security / dependencies. Effort: S. Status: Confirmed.
 
 **Dependencies and risks.** Low. All are patch-level within the ranges the Gemfile allows.
 
-### 2.4 Routine minor updates (done in 1.5.1)
+### 2.4 Routine minor updates (done in 1.6.0)
 
 Priority: Low. Category: Dependencies. Effort: S. Status: Confirmed.
 
@@ -271,7 +273,7 @@ Diff:
 
 **Dependencies and risks.** Largest item in the roadmap. Do it after 1.1, 1.2 and 3.2 have specs, so the rewrite has a safety net. It changes the failure text; that is not a public API, but mention it.
 
-### 3.2 `compare_exact_array` does not dispatch element schemas
+### 3.2 `compare_exact_array` does not dispatch element schemas (done in 1.6.0)
 
 Priority: Medium. Category: Correctness / consistency. Effort: S. Status: Confirmed.
 
@@ -454,7 +456,7 @@ Priority: Medium. Category: CI. Effort: M. Status: Confirmed.
 
 **Recommended solution.** After 2.1, the runtime matrix only needs Ruby versions (3.2, 3.3, 3.4, 4.0) with the plain Gemfile. Keep one or two Rails appraisals that actually load `rspec-rails` and run the generator specs from 5.1 against a minimal dummy app. Add `permissions: contents: read` and a `concurrency` group while touching the file.
 
-### 5.3 Supply-chain checks are not automated (done in 1.5.1)
+### 5.3 Supply-chain checks are not automated (done in 1.6.0)
 
 Priority: Medium. Category: Security / DevOps. Effort: S. Status: Confirmed.
 
@@ -470,7 +472,7 @@ Priority: Medium. Category: DevOps. Effort: M. Status: Confirmed.
 
 **Recommended solution.** A release workflow using RubyGems Trusted Publishing triggered by a `v*` tag, so publishing requires a tag and a green build. Backfill the missing tags from the version-bump commits and write short CHANGELOG entries from `git log` for 1.1 to 1.3.1.
 
-### 5.5 The gem packages repository tooling (done in 1.5.1)
+### 5.5 The gem packages repository tooling (done in 1.6.0)
 
 Priority: Low. Category: Packaging. Effort: S. Status: Confirmed.
 
@@ -513,8 +515,8 @@ Priority: Low. Category: Developer experience. Effort: S. Status: Confirmed.
 
 ## Phased plan
 
-**Phase 1, patch release 1.5.1. Done.** 1.1, 1.3, 1.4, 1.6, 1.7, 2.3, 2.4, 5.3, 5.5, all additive or pure fixes with a spec each. The suite went from 63 examples to 83, `bundler-audit` reports no vulnerabilities, and the packaged gem dropped from 39 files to 20. Not yet released to RubyGems.
+**Phase 1, released as 1.6.0. Done.** 1.1, 1.3, 1.4, 1.6, 1.7, 2.3, 2.4, 3.2, 5.3, 5.5, with a spec each. The suite went from 63 examples to 89, `bundler-audit` reports no vulnerabilities, and the packaged gem dropped from 39 files to 20. Not yet published to RubyGems.
 
-**Phase 2, 2.0.0 (one to two weeks).** 1.2, 1.5, 3.2, 3.4, 3.9 (behaviour changes bundled in one CHANGELOG), 2.1 and 2.2 (dependency cut), 2.5, 3.7, 5.1 unit specs, 5.2 matrix rework, 5.6 documentation. Bump the major because 1.2, 1.5 and 2.1 can each break an existing suite.
+**Phase 2, 2.0.0 (one to two weeks).** 1.2, 1.5, 3.4, 3.9 (behaviour changes bundled in one CHANGELOG), 2.1 and 2.2 (dependency cut), 2.5, 3.7, 5.1 unit specs, 5.2 matrix rework, 5.6 documentation. Bump the major because 1.2, 1.5 and 2.1 can each break an existing suite.
 
 **Phase 3, 2.x (ongoing).** 3.3 DSL helpers, then 4.1, 4.2, 4.8 on top of them; 3.1 mismatch reporting once the DSL is settled; 4.3, 4.4, 4.5, 4.6, 4.7; 5.4 release automation; 1.8 and 3.6 disappear as part of 3.1.

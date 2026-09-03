@@ -18,14 +18,12 @@ Gem::Specification.new do |spec|
   spec.metadata["changelog_uri"] = "https://github.com/nomtek/rspec-json_api/blob/master/CHANGELOG.md"
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  # Ship what a consumer loads and nothing else: the library, the generators
-  # (templates included, so the dotfile markers that keep the empty interface
-  # and type directories must be globbed too), plus the licence and reference
-  # documents. Listing every tracked file, as `git ls-files` did, packaged the
-  # repository's own tooling inside the released gem: the CI workflow, the
-  # RuboCop config, the Gemfile and lockfile, the Rakefile, bin/ and gemfiles/.
+  # Ship what a consumer loads and nothing else: the library and generators
+  # (dotfile markers included, so the empty template directories survive), plus
+  # the licence and reference documents. Scoping `git ls-files` to lib/ keeps the
+  # repository's own tooling out without letting untracked artefacts in.
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    Dir.glob("lib/**/*", File::FNM_DOTMATCH).select { |f| File.file?(f) }.sort +
+    `git ls-files -z lib`.split("\x0").select { |f| File.file?(f) }.sort +
       %w[CHANGELOG.md LICENSE.txt README.md]
   end
   spec.require_paths = ["lib"]

@@ -31,14 +31,12 @@ RSpec.describe "match_json_schema matcher" do
     it "fails instead of raising for nil" do
       matcher = match_json_schema({ id: String })
 
-      expect { matcher.matches?(nil) }.not_to raise_error
       expect(matcher.matches?(nil)).to be(false)
     end
 
     it "fails instead of raising for an already-parsed Hash" do
       matcher = match_json_schema({ id: String })
 
-      expect { matcher.matches?({ id: "x" }) }.not_to raise_error
       expect(matcher.matches?({ id: "x" })).to be(false)
     end
 
@@ -47,6 +45,13 @@ RSpec.describe "match_json_schema matcher" do
       matcher.matches?(nil)
 
       expect(matcher.failure_message).to include("JSON String", "NilClass")
+    end
+
+    it "fails the negated form too, rather than passing by default" do
+      matcher = match_json_schema({ id: String })
+
+      expect(matcher.does_not_match?(nil)).to be(false)
+      expect(matcher.failure_message_when_negated).to include("JSON String", "NilClass")
     end
   end
 
@@ -58,6 +63,11 @@ RSpec.describe "match_json_schema matcher" do
 
     it "raises ArgumentError when the Proc expects an argument" do
       expect { match_json_schema({ a: ->(value) { value > 1 } }).matches?({ a: 2 }.to_json) }
+        .to raise_error(ArgumentError, /must take no arguments/)
+    end
+
+    it "raises ArgumentError when a non-lambda Proc expects an argument" do
+      expect { match_json_schema({ a: proc { |value| value > 1 } }).matches?({ a: 2 }.to_json) }
         .to raise_error(ArgumentError, /must take no arguments/)
     end
   end
@@ -621,6 +631,50 @@ RSpec.describe "match_json_schema matcher" do
 
       let(:actual) do
         { tags: "ab" }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+  end
+
+  context "when an exact-array schema of objects meets elements of another shape" do
+    let(:expected) do
+      { tags: [{ id: Integer }, { id: Integer }] }
+    end
+
+    context "when the elements are scalars" do
+      let(:actual) do
+        { tags: %w[a b] }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+
+    context "when the elements are null" do
+      let(:actual) do
+        { tags: [nil, nil] }.to_json
+      end
+
+      include_examples "incorrect-match"
+    end
+  end
+
+  context "when an exact-array schema holds a type" do
+    let(:expected) do
+      { uris: [RSpec::JsonApi::Types::URI] }
+    end
+
+    context "when correct match" do
+      let(:actual) do
+        { uris: ["https://example.com/a"] }.to_json
+      end
+
+      include_examples "correct-match"
+    end
+
+    context "when incorrect match" do
+      let(:actual) do
+        { uris: ["not a uri"] }.to_json
       end
 
       include_examples "incorrect-match"

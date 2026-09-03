@@ -29,7 +29,7 @@ module RSpec
       end
 
       def validate!(options)
-        raise ArgumentError, "schema Proc must return an options Hash, got #{options.class}" unless options.is_a?(Hash)
+        raise ArgumentError, "options must be a Hash, got #{options.class}" unless options.is_a?(Hash)
 
         unknown = options.keys - SUPPORTED_OPTIONS
         return if unknown.empty?

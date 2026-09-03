@@ -55,7 +55,7 @@ RSpec.describe UsersController, type: :controller do
         id: RSpec::JsonApi::Types::UUID,
         name: String,
         age: Integer,
-        favoriteColorHex: /^\#([a-fA-F]|[0-9]){3,6}$/,
+        favoriteColorHex: /\A\#([a-fA-F]|[0-9]){3,6}\z/,
         number: -> { { type: Integer, min: 10, max: 20, lambda: lambda(&:even?) } }
       }]
     end
@@ -133,7 +133,7 @@ Custom type example:
 module RSpec
   module JsonApi
     module Types
-      COLOR_HEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+      COLOR_HEX = /\A#(?:[0-9a-fA-F]{3}){1,2}\z/
     end
   end
 end
@@ -223,10 +223,11 @@ end
 ```ruby
 let(:expected_schema) do
   {
-    color: /^\#([a-fA-F]|[0-9]){3,6}$/
+    color: /\A\#([a-fA-F]|[0-9]){3,6}\z/
   }
 end
 ```
+_Note: anchor with `\A` and `\z`, not `^` and `$`. `^` and `$` match at line boundaries, so `/^\#[0-9a-fA-F]{3}$/` also accepts `"not a color\n#FFF"` and the value only has to contain a matching line for the schema to pass. The built-in `EMAIL`, `URI` and `UUID` types are anchored this way._
 
 ### Interface match
 ```ruby
