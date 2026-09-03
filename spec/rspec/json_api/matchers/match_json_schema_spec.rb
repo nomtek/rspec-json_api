@@ -386,6 +386,22 @@ RSpec.describe "match_json_schema matcher" do
 
         include_examples "incorrect-match"
       end
+
+      context "when a valid uri is embedded in surrounding text" do
+        let(:actual) do
+          { uri: "see https://example.com for details" }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
+
+      context "when a valid uri is surrounded by whitespace" do
+        let(:actual) do
+          { uri: "  https://example.com  " }.to_json
+        end
+
+        include_examples "incorrect-match"
+      end
     end
 
     describe "uuid" do
