@@ -1,13 +1,41 @@
 name: Ruby
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    # Weekly, matching .github/dependabot.yml: a scheduled run is the only way
+    # bundler-audit sees an advisory published against a lockfile nobody has
+    # touched. Only the audit leg runs on this trigger, via the `if` on `test`
+    # and the matrix in `checks`. The minute is off the hour on purpose: :00 is
+    # GitHub's busiest slot and runs scheduled there are routinely delayed.
+    - cron: "17 6 * * 1"
+  # GitHub disables the cron above after 60 days without repository activity,
+  # which is exactly the dormant repository the audit is meant to cover. This
+  # is the manual path, and running it also re-arms the schedule.
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  # Only PR pushes are worth cancelling. Cancelling a master run would leave
+  # that commit recorded as cancelled instead of green or red, and would kill
+  # the run that populates the cache PR runs restore from.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
+    # The scheduled run is for the advisory check; the compatibility matrix has
+    # nothing new to say about a tree nobody has touched.
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
+    # Generous next to the 10-20s a warm run takes, because a dependabot
+    # lockfile bump misses the bundler cache and installs a full Rails tree
+    # from source. Still bounds a hang well under the 6-hour default.
+    timeout-minutes: 30
     name: "rspec - Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }}"
     strategy:
       fail-fast: false
@@ -25,7 +53,16 @@ jobs:
     env:
       BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
     steps:
-      - uses: actions/checkout@v5
+      # actions/checkout is pinned by commit SHA; dependabot bumps the SHA and
+      # the trailing version comment together. ruby/setup-ruby stays on the
+      # `v1` tag upstream documents, because a pinned release only knows the
+      # Ruby builds it shipped with: an added matrix entry (ROADMAP 5.2 plans
+      # Ruby 4.0) would fail with an unhelpful unknown-version error.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No step needs git credentials after checkout, and bundler runs
+          # gemspec and native-extension code from the branch under test.
+          persist-credentials: false
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -34,11 +71,27 @@ jobs:
       - name: Run rspec
         run: bundle exec rspec
 
-  lint:
+  checks:
     runs-on: ubuntu-latest
-    name: rubocop
+    timeout-minutes: 30
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Each leg's `command` is executed by the single step at the end of
+        # this job, so the `bundle exec ...` lines live here rather than in a
+        # `run:`. rubocop lints the tree; bundler-audit checks the lockfile
+        # against the advisory database. A scheduled run drops the rubocop leg
+        # for the reason given on `test` above, and repeats the audit entry
+        # because an expression can only pick between whole lists.
+        include: >-
+          ${{ github.event_name == 'schedule'
+          && fromJSON('[{"name": "bundler-audit", "command": "bundle exec bundle-audit check --update"}]')
+          || fromJSON('[{"name": "rubocop", "command": "bundle exec rubocop"}, {"name": "bundler-audit", "command": "bundle exec bundle-audit check --update"}]') }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -46,19 +99,5 @@ jobs:
           # gem's own 3.2 floor is covered by the test matrix.
           ruby-version: "3.4"
           bundler-cache: true
-      - name: Run rubocop
-        run: bundle exec rubocop
-
-  audit:
-    runs-on: ubuntu-latest
-    name: bundler-audit
-    steps:
-      - uses: actions/checkout@v5
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          # As in the lint job: the root lockfile needs Ruby >= 3.3.
-          ruby-version: "3.4"
-          bundler-cache: true
-      - name: Check the lockfile against the advisory database
-        run: bundle exec bundle-audit check --update
+      - name: Run ${{ matrix.name }}
+        run: ${{ matrix.command }}
