@@ -1,7 +1,7 @@
 ## [Unreleased]
 
 ### Changed
-- CI pins `actions/checkout` by commit SHA (v7.0.1) instead of the mutable `v7` tag, so a repointed upstream tag cannot change what runs without a diff here. `ruby/setup-ruby` deliberately stays on `v1`, the reference upstream documents, because a pinned release only knows the Ruby builds it shipped with. Checkout also runs with `persist-credentials: false`: no step needs git credentials, and bundler evaluates gemspec and native-extension code from the branch under test.
+- CI runs `actions/checkout@v7`, up from v5, alongside `ruby/setup-ruby@v1`. Both track their major tag, so upstream patch releases arrive without a commit here and Dependabot opens a pull request for each new major. Checkout also runs with `persist-credentials: false`: no step needs git credentials, and bundler evaluates gemspec and native-extension code from the branch under test.
 - The workflow runs once per change rather than twice. `push` is scoped to `master`, so a branch with an open pull request no longer builds under both events, and a `concurrency` group cancels superseded pull request runs. Runs on `master` are left alone, so every commit there keeps a result.
 - `rubocop` and `bundler-audit` share one job definition instead of two byte-identical ones, and every job carries `timeout-minutes: 30` in place of the six-hour default.
 
