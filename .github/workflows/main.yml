@@ -53,12 +53,9 @@ jobs:
     env:
       BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
     steps:
-      # actions/checkout is pinned by commit SHA; dependabot bumps the SHA and
-      # the trailing version comment together. ruby/setup-ruby stays on the
-      # `v1` tag upstream documents, because a pinned release only knows the
-      # Ruby builds it shipped with: an added matrix entry (ROADMAP 5.2 plans
-      # Ruby 4.0) would fail with an unhelpful unknown-version error.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Both actions track their major tag, so upstream patch releases arrive
+      # without a commit here. Dependabot opens a PR for each new major.
+      - uses: actions/checkout@v7
         with:
           # No step needs git credentials after checkout, and bundler runs
           # gemspec and native-extension code from the branch under test.
@@ -89,7 +86,7 @@ jobs:
           && fromJSON('[{"name": "bundler-audit", "command": "bundle exec bundle-audit check --update"}]')
           || fromJSON('[{"name": "rubocop", "command": "bundle exec rubocop"}, {"name": "bundler-audit", "command": "bundle exec bundle-audit check --update"}]') }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Set up Ruby
