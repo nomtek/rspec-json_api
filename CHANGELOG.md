@@ -1,4 +1,4 @@
-## [Unreleased]
+## [2.0.0] - 2026-09-14
 
 ### Fixed
 - Exact arrays enforce full key structure for Hash elements. Extra null-valued keys and missing keys that happen to accept blank values no longer pass inside tuples.
