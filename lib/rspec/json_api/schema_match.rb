@@ -10,31 +10,28 @@ module RSpec
     module SchemaMatch
       module_function
 
-      # Top-level comparison. Applies the shape guards (class equality and, for
-      # objects, key-set equality) before recursing.
+      # Top-level comparison. Applies shape guards to objects and collections,
+      # then uses the same value dispatch as nested schema values.
       def match(actual, expected)
-        return false unless actual.instance_of?(expected.class)
-
         case expected
         when Array
           compare_array(actual, expected)
         when Hash
+          return false unless actual.is_a?(Hash)
           return false unless same_key_structure?(actual, expected)
 
           compare(actual, expected)
         else
-          compare_simple_value(actual, expected)
+          compare_values(actual, expected)
         end
       end
 
       def same_key_structure?(actual, expected)
-        Traversal.deep_sort(Traversal.deep_keys(actual)) ==
-          Traversal.deep_sort(Traversal.deep_keys(expected))
+        Traversal.same_key_structure?(actual, expected)
       end
 
       def compare(actual, expected)
         return false unless actual.is_a?(Hash)
-        return false if actual.blank? && expected.present?
 
         keys = Traversal.deep_key_paths(expected) | Traversal.deep_key_paths(actual)
 
@@ -77,7 +74,7 @@ module RSpec
       end
 
       def compare_regexp(actual_value, expected_value)
-        expected_value.match?(actual_value.to_s)
+        actual_value.is_a?(String) && expected_value.match?(actual_value)
       end
 
       # A schema Proc describes the constraints for a value; it is called without
@@ -142,7 +139,7 @@ module RSpec
         return false if actual_value.size != expected_value.size
 
         expected_value.each_with_index.all? do |elem, index|
-          elem.is_a?(Hash) ? compare(actual_value[index], elem) : compare_values(actual_value[index], elem)
+          elem.is_a?(Hash) ? match(actual_value[index], elem) : compare_values(actual_value[index], elem)
         end
       end
 

@@ -45,6 +45,10 @@ module RSpec
           !matches?(actual) && !@type_error
         end
 
+        def description
+          "match JSON schema"
+        end
+
         # Provides a failure message for when the JSON data does not match the expected schema.
         # @return [String] A descriptive message detailing the mismatch between expected and actual JSON.
         def failure_message

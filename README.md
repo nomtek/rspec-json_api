@@ -1,135 +1,168 @@
 # RSpec::JsonApi
 
-[RSpec:JsonAPI](https://github.com/nomtek/rspec-json_api) 
-is an extension for [RSpec](https://github.com/rspec) 
-to easily allow testing JSON API responses.
+`rspec-json_api` adds RSpec matchers for checking JSON values against compact Ruby schemas. Despite the name, it validates general JSON response shapes; it does not implement the [JSON:API specification](https://jsonapi.org/).
+
+## Requirements
+
+- Ruby 3.2 or newer
+- RSpec 3
+- Rails 6.1 or newer only when using the optional generators
+
+The CI suite covers matcher behavior on Ruby 3.2, 3.3, 3.4, and 4.0. Generator integration is exercised at the supported Rails boundaries: Rails 6.1 on Ruby 3.2 and Rails 8.1 on Ruby 3.4.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add the gem to your test group:
 
 ```ruby
-gem 'rspec-json_api'
-```
-
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install rspec-json_api
-
-Generate directory tree:
-
-    rails generate rspec:json_api:install
-
-Require gem assets in your `rails_helper.rb`
-```ruby
-Dir[File.join(__dir__, 'rspec', 'json_api', 'types', '*.rb')].each { |file| require file }
-Dir[File.join(__dir__, 'rspec', 'json_api', 'interfaces', '*.rb')].each { |file| require file }
-```
-
-## Generators
-
-Using build-in generators it's possible to create custom interface and type.
-
-Generate new template:
-
-    rails generate rspec:json_api:interface interface-name
-
-Generate new type:
-
-    rails generate rspec:json_api:type type-name
-
-
-## Example usage
-
-```ruby
-# spec/controllers/users_controller_spec.rb
-
-RSpec.describe UsersController, type: :controller do
-  describe '#index' do
-    let(:expected_schema) do
-      [{
-        id: RSpec::JsonApi::Types::UUID,
-        name: String,
-        age: Integer,
-        favoriteColorHex: /\A\#([a-fA-F]|[0-9]){3,6}\z/,
-        number: -> { { type: Integer, min: 10, max: 20, lambda: lambda(&:even?) } }
-      }]
-    end
-
-    it 'matches API response' do
-      get :index
-
-      expect(response.body).to match_json_schema(expected_schema)
-    end
-  end
-  
-  describe '#update' do
-    it 'matches API response' do
-      put :update, params: { name: 'John', age: 35 }
-      
-      expect(response.body).to have_no_content
-    end
-  end
+group :test do
+  gem "rspec-json_api"
 end
 ```
 
-## Built-in matchers
-- ### match_json_schema
-```
-  expect(response.body).to match_json_schema(expected_schema)
+Then run:
+
+```sh
+bundle install
 ```
 
-- ### have_no_content
-```
-  expect(response.body).to have_no_content
-```
-
-## Interfaces
-The gem introduces interfaces to reuse them during test matches.
+Load the matchers from `spec/spec_helper.rb` (or your equivalent RSpec setup file):
 
 ```ruby
-# spec/rspec/json_api/interfaces/example_interface.rb
-
-module RSpec
-  module JsonApi
-    module Interfaces
-      EXAMPLE_INTERFACE = {
-        id: Types::UUID,
-        name: String,
-        number: Integer,
-        color: -> { { inclusion: %w[black red white], allow_blank: true } }
-      }.freeze
-    end
-  end
-end
+require "rspec/json_api"
 ```
-_Note: You can either generate file on your own or use generator._
-## Types
 
-The gem allow users either to user build-in types or define owns. 
-### Build-in types
-- #### EMAIL
+Rails projects can generate the definition directories:
+
+```sh
+rails generate rspec:json_api:install
+```
+
+Load custom types before interfaces in `rails_helper.rb`, because interfaces may reference types:
+
+```ruby
+Dir[File.join(__dir__, "rspec", "json_api", "types", "*.rb")].each { |file| require file }
+Dir[File.join(__dir__, "rspec", "json_api", "interfaces", "*.rb")].each { |file| require file }
+```
+
+The matchers themselves do not depend on Rails, ActiveSupport, or `rspec-rails`.
+
+## Matchers
+
+### `match_json_schema`
+
+Pass the matcher a JSON String and describe the parsed value with Ruby values, classes, regular expressions, arrays, hashes, or constraint Procs:
+
+```ruby
+schema = {
+  id: RSpec::JsonApi::Types::UUID,
+  name: String,
+  age: -> { { type: Integer, min: 18 } },
+  tags: [String]
+}
+
+expect(response.body).to match_json_schema(schema)
+```
+
+The actual value must be a JSON String. Invalid JSON and non-String inputs fail the match. Schema keys must be symbols because JSON object keys are symbolized while parsing.
+
+Object schemas are strict at every nesting level: every expected key must be present and unexpected keys fail the match. `allow_blank` permits a blank value; it does not make a key optional.
+
+Root schemas may describe objects, arrays, or scalar JSON values:
+
+```ruby
+expect('"ready"').to match_json_schema(String)
+expect('"ready"').to match_json_schema(/\Aready\z/)
+expect("42").to match_json_schema(42)
+```
+
+### `have_no_content`
+
+`have_no_content` matches only an empty String:
+
+```ruby
+expect(response.body).to have_no_content
+```
+
+JSON objects, JSON arrays, and whitespace-only bodies are considered content.
+
+## Schema Values
+
+### Exact values
+
+```ruby
+schema = { status: "ready", count: 2 }
+```
+
+### Classes
+
+Classes use `instance_of?`, so subclasses do not match:
+
+```ruby
+schema = { id: Integer, name: String }
+```
+
+### Regular expressions
+
+A regular expression matches only a JSON String. Numbers, booleans, and `null` do not match after conversion:
+
+```ruby
+schema = { color: /\A#[0-9a-fA-F]{6}\z/ }
+```
+
+Use `\A` and `\z` for whole-string validation. Ruby's `^` and `$` are line anchors and may accept a matching line inside a multiline value.
+
+### Arrays
+
+Array schemas have three forms:
+
+```ruby
+[String]                         # any-length list of Strings
+[{ id: Integer, name: String }] # any-length list of this object shape
+[Integer, String]               # an exact two-element tuple
+```
+
+The one-element shorthand applies only to a Class or Hash. For example, `[Types::UUID]` means an exact one-element array because `Types::UUID` is a Regexp.
+
+### Constraint Procs
+
+A constraint Proc takes no arguments and returns an options Hash:
+
+```ruby
+schema = {
+  age: -> { { type: Integer, min: 18, max: 120 } },
+  role: -> { { inclusion: %w[admin member] } },
+  code: -> { { regex: /\A[A-Z]{3}\z/ } },
+  even: -> { { lambda: ->(value) { value.even? } } },
+  nickname: -> { { type: String, allow_blank: true } }
+}
+```
+
+Supported options are `allow_blank`, `type`, `value`, `min`, `max`, `inclusion`, `regex`, and `lambda`. All supplied constraints must pass. Unknown options, a non-Hash return value, or a Proc that declares an argument raises `ArgumentError` with usage guidance.
+
+`allow_blank: true` accepts `null`, `false`, empty strings, whitespace-only strings, empty arrays, and empty objects. The key itself remains required.
+
+## Built-in Types
+
+The built-in types are anchored regular expressions:
+
 ```ruby
 RSpec::JsonApi::Types::EMAIL
-```
-- #### URI
-```ruby
 RSpec::JsonApi::Types::URI
-```
-- #### UUID
-```ruby
 RSpec::JsonApi::Types::UUID
 ```
 
+`URI` accepts schemes supported by Ruby's standard URI parser, not only HTTP and HTTPS.
 
-Custom type example:
+Generate a custom type with Rails:
+
+```sh
+rails generate rspec:json_api:type color_hex
+```
+
+Or define one directly:
+
 ```ruby
-# spec/rspec/json_api/types/color_hex.rb
-
 module RSpec
   module JsonApi
     module Types
@@ -137,184 +170,57 @@ module RSpec
     end
   end
 end
-
-RSpec::JsonApi::Types::COLOR_HEX
 ```
 
-_Note: You can either generate file on your own or use generator._
-## Matching methods
-The gem offers variety of possible matching methods.
+## Interfaces
 
-### Presumptions
-- `match_json_schema` always require full keys match.
+Interfaces are reusable strict object schemas:
 
-  Failure Example:
-    ```ruby
-    let(:expected_schema) do
-      {
-        id: RSpec::JsonApi::Types::UUID,
+```ruby
+module RSpec
+  module JsonApi
+    module Interfaces
+      PERSON = {
+        id: Types::UUID,
         name: String,
-        age: Integer
-      }
+        active: -> { { inclusion: [true, false] } }
+      }.freeze
     end
-  
-    let(:actual) do
-      {
-        id: "0a2f911f-3767-4cc7-9c19-049f4350e38c",
-        name: "Mikel",
-      }
-    end
-    ```
-  
-  Success Example:
-  ```ruby
-  let(:expected_schema) do
-    {
-      id: RSpec::JsonApi::Types::UUID,
-      name: String,
-      age: Integer
-    }
   end
-
-  let(:actual) do
-    {
-      id: "0a2f911f-3767-4cc7-9c19-049f4350e38c",
-      name: "John",
-      age: 24
-    }
-  end
-  ```
-
-### Value match
-```ruby
-let(:expected_schema) do
-  {
-    id: "e0067346-4d24-4aa6-b303-f927a410a001",
-    name: "John",
-    age: 24,
-    favoriteColorHex: "#FF5733"
-  }
 end
 ```
 
-### Class match
-```ruby
-let(:expected_schema) do
-  {
-    id: Integer,
-    name: String,
-    age: Integer,
-    notes: [String]
-  }
-end
+Generate one with:
+
+```sh
+rails generate rspec:json_api:interface person
 ```
 
-### Type match
-```ruby
-let(:expected_schema) do
-  {
-    id: RSpec::JsonApi::Types::UUID,
-    email: RSpec::JsonApi::Types::EMAIL,
-  }
-end
-```
-
-### Regexp match
-```ruby
-let(:expected_schema) do
-  {
-    color: /\A\#([a-fA-F]|[0-9]){3,6}\z/
-  }
-end
-```
-_Note: anchor with `\A` and `\z`, not `^` and `$`. `^` and `$` match at line boundaries, so `/^\#[0-9a-fA-F]{3}$/` also accepts `"not a color\n#FFF"` and the value only has to contain a matching line for the schema to pass. The built-in `EMAIL`, `URI` and `UUID` types are anchored this way._
-
-### Interface match
-```ruby
-let(:expected_schema) do
-    [RSpec::JsonApi::Interfaces::PERSON]
-end
-```
-
-### Proc match
-Proc match allows to customize schema according needs using lambda shorthand notation `->`
-
-Supported options:
-- #### type
-```ruby
-let(:expected_schema) do
-  {
-    name: -> { { type: String } }
-  }
-end
-```
-- #### value
-```ruby
-let(:expected_schema) do
-  {
-    name: -> { { value: "John" } }
-  }
-end
-```
-- #### min
-```ruby
-let(:expected_schema) do
-  {
-    age: -> { { min: 15 } }
-  }
-end
-```
-- #### max
-```ruby
-let(:expected_schema) do
-  {
-    age: -> { { max: 25 } }
-  }
-end
-```
-- #### inclusion
-```ruby
-let(:expected_schema) do
-  {
-    letter: -> { { inclusion: %w[A B C] } }
-  }
-end
-```
-- #### regex
-```ruby
-let(:expected_schema) do
-  {
-    hex: -> { { regex: /^\#([a-fA-F]|[0-9]){3,6}$/ } }
-  }
-end
-```
-- #### lambda
-```ruby
-let(:expected_schema) do
-  {
-    number: -> { { lambda: lambda(&:even?) } }
-  }
-end
-```
-- #### allow_blank
+Use an interface directly or as a homogeneous list schema:
 
 ```ruby
-let(:expected_schema) do
-  {
-    name: -> { { type: String, allow_blank: true } }
-  }
-end
+expect(response.body).to match_json_schema(RSpec::JsonApi::Interfaces::PERSON)
+expect(response.body).to match_json_schema([RSpec::JsonApi::Interfaces::PERSON])
 ```
-_Note: Default value is `false`_
 
-## Contributing
+## Development
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/nomtek/rspec-json_api. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/nomtek/rspec-json_api/blob/master/CODE_OF_CONDUCT.md).
+Use the Ruby version in `.ruby-version` and Bundler 4.0.4:
+
+```sh
+gem install bundler -v 4.0.4
+bundle install
+bundle exec rspec
+bundle exec rubocop
+bundle exec bundle-audit check --update
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for compatibility and contribution guidance. Please report vulnerabilities using [GitHub's private security advisory form](https://github.com/nomtek/rspec-json_api/security/advisories/new), as described in [SECURITY.md](SECURITY.md).
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+The gem is available under the terms of the [MIT License](LICENSE.txt).
 
 ## Code of Conduct
 
-Everyone interacting in the RSpec::JsonApi project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/nomtek/rspec-json_api/blob/master/CODE_OF_CONDUCT.md).
+Everyone participating in this project is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).

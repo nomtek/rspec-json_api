@@ -20,7 +20,7 @@ RSpec.describe "rspec-json_api.gemspec" do
   end
 
   it "packages the licence and the reference documents" do
-    expect(gemspec.files).to include("LICENSE.txt", "README.md", "CHANGELOG.md")
+    expect(gemspec.files).to include("LICENSE.txt", "README.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md")
   end
 
   it "packages every tracked file under lib and nothing else from there" do
@@ -30,6 +30,12 @@ RSpec.describe "rspec-json_api.gemspec" do
   end
 
   it "packages nothing outside lib but the licence and the reference documents" do
-    expect(gemspec.files.grep_v(%r{\Alib/})).to contain_exactly("CHANGELOG.md", "LICENSE.txt", "README.md")
+    expect(gemspec.files.grep_v(%r{\Alib/})).to contain_exactly(
+      "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE.txt", "README.md", "SECURITY.md"
+    )
+  end
+
+  it "keeps the runtime dependency set Rails-free" do
+    expect(gemspec.runtime_dependencies.map(&:name)).to contain_exactly("diffy", "rspec-expectations")
   end
 end

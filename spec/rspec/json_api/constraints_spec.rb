@@ -24,5 +24,21 @@ RSpec.describe RSpec::JsonApi::Constraints do
       expect(described_class.match(5, type: Integer, min: 3, max: 10)).to be(true)
       expect(described_class.match(2, type: Integer, min: 3)).to be(false)
     end
+
+    it "applies inclusion, regex, and lambda constraints" do
+      expect(described_class.match("red", inclusion: %w[red blue])).to be(true)
+      expect(described_class.match("ABC-123", regex: /\A[A-Z]+-\d+\z/)).to be(true)
+      expect(described_class.match(4, lambda: lambda(&:even?))).to be(true)
+    end
+
+    it "rejects non-String values for regex constraints" do
+      expect(described_class.match(123, regex: /\A\d+\z/)).to be(false)
+      expect(described_class.match(nil, regex: /.*/)).to be(false)
+    end
+
+    it "rejects non-numeric bounds" do
+      expect(described_class.match("5", min: 3)).to be(false)
+      expect(described_class.match(5, max: "10")).to be(false)
+    end
   end
 end

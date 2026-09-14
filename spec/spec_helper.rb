@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+require "simplecov"
+
+SimpleCov.start do
+  add_filter "/spec/"
+  minimum_coverage 90
+end
+
 require "rspec/json_api"
 
 RSpec.configure do |config|
@@ -8,6 +15,8 @@ RSpec.configure do |config|
 
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
+  config.order = :random
+  config.warnings = true
 
   config.expect_with :rspec do |c|
     c.syntax = :expect

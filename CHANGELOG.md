@@ -1,12 +1,29 @@
 ## [Unreleased]
 
+### Fixed
+- Exact arrays enforce full key structure for Hash elements. Extra null-valued keys and missing keys that happen to accept blank values no longer pass inside tuples.
+- Nested key checks preserve each key's parent association. Objects with the same nested key names attached to different parents no longer match when the affected values are `null`.
+- Regexp schemas require a String value instead of matching `to_s`. Numeric values and `null` no longer satisfy permissive regular expressions.
+
 ### Changed
+- Removed ActiveSupport blank/present core extensions in favor of a JSON-focused internal helper with the same relevant semantics.
+- Runtime dependencies are now only `diffy` and `rspec-expectations`. Rails, Railties, ActiveSupport, and `rspec-rails` are no longer installed for matcher-only consumers. Projects using the optional generators must provide Rails themselves.
+- The compatibility matrix tests matcher behavior without Rails on Ruby 3.2, 3.3, 3.4, and 4.0. Separate generator jobs exercise Rails 6.1 and Rails 8.1 at the supported boundaries.
+- The README now documents strict key behavior, schema dispatch, errors, array shorthand, supported runtimes, and the fact that this is a general JSON shape matcher rather than a JSON:API implementation.
 - CI runs `actions/checkout@v7`, up from v5, alongside `ruby/setup-ruby@v1`. Both track their major tag, so upstream patch releases arrive without a commit here and Dependabot opens a pull request for each new major. Checkout also runs with `persist-credentials: false`: no step needs git credentials, and bundler evaluates gemspec and native-extension code from the branch under test.
 - The workflow runs once per change rather than twice. `push` is scoped to `master`, so a branch with an open pull request no longer builds under both events, and a `concurrency` group cancels superseded pull request runs. Runs on `master` are left alone, so every commit there keeps a result.
 - `rubocop` and `bundler-audit` share one job definition instead of two byte-identical ones, and every job carries `timeout-minutes: 30` in place of the six-hour default.
 
 ### Added
+- Top-level Class and Regexp schemas now work for scalar JSON documents, using the same dispatch rules as nested values.
+- `match_json_schema` exposes an RSpec description for one-line and documentation formatter output.
+- Direct unit coverage for schema matching, traversal, constraints, and the Rails generators; randomized spec ordering; Ruby warnings; and a 90% SimpleCov floor.
+- Contributor and security policy documents, included in the packaged gem.
 - A weekly `schedule` trigger, so `bundler-audit` reports an advisory published against a lockfile nobody has touched. Only the audit runs on that trigger. `workflow_dispatch` runs it on demand and is also how the cron is re-armed, since GitHub disables scheduled workflows after 60 days without repository activity.
+
+### Removed
+- The internal example interface fixture from the packaged library; it now lives under test support.
+- Redundant Rails 7.1, 7.2, and 8.0 appraisal files after reducing generator compatibility checks to the supported boundaries.
 
 ## [1.6.0] - 2026-09-03
 

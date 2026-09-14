@@ -44,6 +44,22 @@ module RSpec
           .map { |element| element.is_a?(Array) ? deep_sort(element) : element }
           .sort_by { |element| element.is_a?(Array) ? element.first.to_s : element.to_s }
       end
+
+      # Whether two hashes have the same keys under the same parent objects.
+      def same_key_structure?(actual, expected)
+        same_keys?(actual, expected) && actual.all? do |key, actual_value|
+          same_nested_key_structure?(actual_value, expected[key])
+        end
+      end
+
+      def same_keys?(actual, expected)
+        actual.size == expected.size && actual.each_key.all? { |key| expected.key?(key) }
+      end
+
+      def same_nested_key_structure?(actual, expected)
+        nested = actual.is_a?(Hash) || expected.is_a?(Hash)
+        !nested || (actual.is_a?(Hash) && expected.is_a?(Hash) && same_key_structure?(actual, expected))
+      end
     end
   end
 end

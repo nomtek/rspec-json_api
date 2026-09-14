@@ -21,7 +21,7 @@ module RSpec
       def match(value, options)
         validate!(options)
 
-        return true if value.blank? && options[:allow_blank]
+        return true if Blank.blank?(value) && options[:allow_blank]
 
         options.except(:allow_blank).all? do |option, condition|
           satisfies?(value, option, condition)
@@ -42,7 +42,7 @@ module RSpec
         when :type      then value.instance_of?(condition)
         when :value     then value == condition
         when :inclusion then condition.include?(value)
-        when :regex     then condition.match?(value.to_s)
+        when :regex     then matches_regexp?(value, condition)
         when :lambda    then condition.call(value)
         when :min, :max then within_bound?(value, option, condition)
         end
@@ -52,6 +52,10 @@ module RSpec
         return false unless value.is_a?(Numeric) && condition.is_a?(Numeric)
 
         option == :min ? value >= condition : value <= condition
+      end
+
+      def matches_regexp?(value, condition)
+        value.is_a?(String) && condition.match?(value)
       end
     end
   end

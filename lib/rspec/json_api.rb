@@ -4,10 +4,11 @@
 require "json"
 require "uri"
 require "diffy"
-require "active_support/core_ext/object/blank"
+require "rspec/expectations"
 
 # Load the json_api parts
 require "rspec/json_api/version"
+require "rspec/json_api/blank"
 require "rspec/json_api/traversal"
 require "rspec/json_api/constraints"
 require "rspec/json_api/schema_match"
