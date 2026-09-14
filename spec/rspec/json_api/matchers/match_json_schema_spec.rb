@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
-require "rspec/json_api/interfaces/example_interface"
+require_relative "../../../support/example_interface"
 
 RSpec.describe "match_json_schema matcher" do
+  it "describes itself for RSpec output" do
+    expect(match_json_schema({ id: String }).description).to eq("match JSON schema")
+  end
+
   shared_examples "correct-match" do
     it "matches expected schema" do
       expect(actual).to match_json_schema(expected)
