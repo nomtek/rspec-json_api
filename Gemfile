@@ -11,7 +11,7 @@ gem "bundler-audit", "~> 0.9"
 gem "rake", "~> 13.2"
 gem "rspec", "~> 3.13"
 gem "rubocop", "~> 1.65"
-gem "simplecov", "~> 0.22"
+gem "simplecov", "~> 1.2"
 
 group :generators do
   gem "railties", ">= 6.1.4.1"
