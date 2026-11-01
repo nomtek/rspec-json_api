@@ -1,4 +1,4 @@
-## [Unreleased]
+## [3.0.0] - 2026-11-01
 
 ### Changed
 - Development dependencies are on their latest releases: RuboCop 1.92, SimpleCov 1.3, Railties 8.1.4, and Bundler 4.0.23. Runtime dependencies are unchanged.
