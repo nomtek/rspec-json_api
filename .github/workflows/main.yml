@@ -40,11 +40,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.2", "3.3", "3.4", "4.0"]
+        ruby: ["3.3", "3.4", "4.0"]
     env:
       # Rails lives in the gemspec's generator development group. Matcher tests
       # prove that the runtime works without installing that dependency tree.
-      BUNDLE_WITHOUT: generators
+      # The lint group is skipped too, so its locked versions may need a newer
+      # Ruby than the gem's floor.
+      BUNDLE_WITHOUT: generators:lint
     steps:
       # Both actions track their major tag, so upstream patch releases arrive
       # without a commit here. Dependabot opens a PR for each new major.
@@ -70,7 +72,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { ruby: "3.2", gemfile: rails_6_1 }
+          - { ruby: "3.3", gemfile: rails_6_1 }
           - { ruby: "3.4", gemfile: rails_8_1 }
     env:
       BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
@@ -110,8 +112,8 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          # The root lockfile pins dev tooling that needs Ruby >= 3.3; the
-          # gem's own 3.2 floor is covered by the test matrix.
+          # The lint tooling tracks a current Ruby; the gem's own 3.3 floor is
+          # covered by the test matrix.
           ruby-version: "3.4"
           bundler-cache: true
       - name: Run ${{ matrix.name }}
