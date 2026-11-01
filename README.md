@@ -8,7 +8,7 @@
 - RSpec 3
 - Rails 6.1 or newer only when using the optional generators
 
-The CI suite covers matcher behavior on Ruby 3.3, 3.4, and 4.0. Generator integration is exercised at the supported Rails boundaries: Rails 6.1 on Ruby 3.3 and Rails 8.1 on Ruby 3.4. Ruby 3.2 reached end of life on 2026-03-31; use rspec-json_api 2.x if you still need it.
+The CI suite covers matcher behavior on Ruby 3.3, 3.4, and 4.0. Generator integration is exercised at the supported Rails boundaries: Rails 6.1 on Ruby 3.3 and Rails 8.1 on Ruby 3.4. Ruby 3.2 reached end of life on 2026-03-31; use rspec-json_api 2.0.x if you still need it.
 
 ## Installation
 

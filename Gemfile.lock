@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rspec-json_api (3.0.0)
+    rspec-json_api (2.1.0)
       diffy (>= 3.4.2)
       rspec-expectations (~> 3.0)
 
