@@ -1,4 +1,4 @@
-## [Unreleased]
+## [2.1.0] - 2026-11-01
 
 ### Changed
 - Development dependencies are on their latest releases: RuboCop 1.92, SimpleCov 1.3, Railties 8.1.4, and Bundler 4.0.23. Runtime dependencies are unchanged.
@@ -7,7 +7,7 @@
 - The CI matrix tests matcher behavior on Ruby 3.3, 3.4, and 4.0, and the Rails 6.1 generator job runs on Ruby 3.3.
 
 ### Removed
-- Ruby 3.2 support. `required_ruby_version` is now `>= 3.3.0`, following Ruby 3.2's end of life on 2026-03-31. Projects still on Ruby 3.2 can stay on rspec-json_api 2.x.
+- Ruby 3.2 support. `required_ruby_version` is now `>= 3.3.0`, following Ruby 3.2's end of life on 2026-03-31. Projects still on Ruby 3.2 can stay on rspec-json_api 2.0.x, and Bundler on Ruby 3.2 keeps resolving it.
 
 ## [2.0.0] - 2026-09-14
 
