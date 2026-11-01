@@ -1,3 +1,10 @@
+## [Unreleased]
+
+### Changed
+- Development dependencies are on their latest releases: RuboCop 1.92, Railties 8.1.4, and Bundler 4.0.23. Runtime dependencies and the Ruby 3.2 floor are unchanged.
+- `rubocop` and `bundler-audit` moved to a `lint` Gemfile group that the matcher test legs skip, so their dependency tree can require Ruby 3.3 without breaking the Ruby 3.2 leg. `simplecov` stays on 0.22 because 1.x needs Ruby 3.3 and every test leg loads it; Dependabot ignores its major updates until the floor moves.
+- `.ruby-version` is 3.4.12, the Ruby line the lint job runs, so a local `bundle install` resolves the committed lockfile without rewriting it.
+
 ## [2.0.0] - 2026-09-14
 
 ### Fixed

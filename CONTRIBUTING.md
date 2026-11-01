@@ -4,10 +4,10 @@ Bug reports and pull requests are welcome.
 
 ## Setup
 
-Use the Ruby version declared in `.ruby-version` and Bundler 4.0.4:
+Use the Ruby version declared in `.ruby-version` and Bundler 4.0.23:
 
 ```sh
-gem install bundler -v 4.0.4
+gem install bundler -v 4.0.23
 bundle install
 ```
 

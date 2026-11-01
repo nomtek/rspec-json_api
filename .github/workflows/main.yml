@@ -44,7 +44,8 @@ jobs:
     env:
       # Rails lives in the gemspec's generator development group. Matcher tests
       # prove that the runtime works without installing that dependency tree.
-      BUNDLE_WITHOUT: generators
+      # The lint group is skipped too: its locked versions need Ruby >= 3.3.
+      BUNDLE_WITHOUT: generators:lint
     steps:
       # Both actions track their major tag, so upstream patch releases arrive
       # without a commit here. Dependabot opens a PR for each new major.

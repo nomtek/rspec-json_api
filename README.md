@@ -205,10 +205,10 @@ expect(response.body).to match_json_schema([RSpec::JsonApi::Interfaces::PERSON])
 
 ## Development
 
-Use the Ruby version in `.ruby-version` and Bundler 4.0.4:
+Use the Ruby version in `.ruby-version` and Bundler 4.0.23:
 
 ```sh
-gem install bundler -v 4.0.4
+gem install bundler -v 4.0.23
 bundle install
 bundle exec rspec
 bundle exec rubocop

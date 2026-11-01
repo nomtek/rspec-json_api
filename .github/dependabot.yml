@@ -8,6 +8,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # simplecov 1.x requires Ruby >= 3.3, but the test legs still run on the
+      # gem's Ruby 3.2 floor. Drop this when that floor moves.
+      - dependency-name: simplecov
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: "/"
