@@ -9,13 +9,11 @@ gemspec
 
 gem "rake", "~> 13.4"
 gem "rspec", "~> 3.13"
-# Held on 0.22: simplecov 1.x requires Ruby >= 3.3, and every test leg loads it,
-# including the Ruby 3.2 one that proves the gem's required_ruby_version.
-gem "simplecov", "~> 0.22"
+gem "simplecov", "~> 1.3"
 
 # Only the lint job needs these, and it runs a current Ruby. Keeping them out of
-# the matcher test legs lets their dependency tree (parallel 2.x needs Ruby
-# >= 3.3) stay current without breaking the Ruby 3.2 leg.
+# the matcher test legs lets their dependency tree require a newer Ruby than
+# the gem's floor without breaking the oldest leg, and those legs install less.
 group :lint do
   gem "bundler-audit", "~> 0.9"
   gem "rubocop", "~> 1.92"
